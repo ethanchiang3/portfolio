@@ -48,24 +48,24 @@ function getTotalBubbles() {
   return layoutPoints.length;
 }
 
-// 19 folders under assets/Ticker: name = folder name, firstImage = ball image, images = ticker strip
+// 19 folders under assets/Ticker: order matches arc mode top-to-bottom (image list)
 const TICKER_FOLDERS = [
   { name: '0', firstImage: '2x_return the prompt unchanged.jpg', images: ['2x_return the prompt unchanged.jpg', '3A927DB1-F317-47BF-BA00-4A6DF368173B.jpg'] },
   { name: 'Goldfish Tumbler', firstImage: 'Gemini_Generated_Image_nv1qcinv1qcinv1q.png', images: ['Gemini_Generated_Image_nv1qcinv1qcinv1q.png'] },
   { name: 'Keep an eye on the clock', firstImage: '2x_replace the product in @1  with @2 (2).png', images: ['2x_replace the product in @1  with @2 (2).png', '2x_replace the product in @1  with @2 (4).png', '2x_replace the product in @1  with @2 (5).png', '2x_replace the product in @1  with @2 (6).png'] },
   { name: 'Kohler | Instant hot water purifier', firstImage: '2x_use @2 as art direction, adjust the image style of the render, remove the leaves.png', images: ['2x_use @2 as art direction, adjust the image style of the render, remove the leaves.png'] },
   { name: 'Logitech | Headset design with genetic algorithm', firstImage: 'NSiSQnPolmOJiNeiwU03kSOu84.png', images: ['NSiSQnPolmOJiNeiwU03kSOu84.png'] },
-  { name: 'Logitech | MX MASTER4', firstImage: '02252026_canova_only_for_rendering.79.png', images: ['02252026_canova_only_for_rendering.79.png', '02252026_canova_only_for_rendering.80.png', '02252026_canova_only_for_rendering.81.png', '02252026_canova_only_for_rendering.83.png', '02252026_canova_only_for_rendering.84.png', '02252026_canova_only_for_rendering.85.gif'] },
+  { name: 'Logitech | MX MASTER4', firstImage: '02252026_canova_only_for_rendering.83.png', images: ['02252026_canova_only_for_rendering.79.png', '02252026_canova_only_for_rendering.80.png', '02252026_canova_only_for_rendering.81.png', '02252026_canova_only_for_rendering.83.png', '02252026_canova_only_for_rendering.85.gif'] },
   { name: 'Logitech | Signature Solar+', firstImage: '452.png', images: ['452.png', '65_W.png', '65_g.png'] },
   { name: 'Logitech | Wave keys Sand Colorway', firstImage: 'Wst8ktbXnbLdfPG0u2yYULITNMg.png', images: ['Wst8ktbXnbLdfPG0u2yYULITNMg.png', 'f5CWz1Z0aud8XSLoZsMmbFWAM.png', 'fp4nvBkUdagCsLmJcPo3CLMCbA.jpg.png'] },
   { name: 'Morph', firstImage: '0wBA3H9BPYhYx2HzNP4h6qFc.png', images: ['0wBA3H9BPYhYx2HzNP4h6qFc.png'] },
   { name: 'Nodes', firstImage: '4x_make this rendering more realistic, use@2 as reference but remove the metal plate (1).png', images: ['4x_make this rendering more realistic, use@2 as reference but remove the metal plate (1).png', 'BLN5kztPlBeUb3sG0DYqC65Kqs.png', 'Grd0PST2Iuf0CXCpXdWbGmrVVYg.png', 'bookend_0220.48.png', 'nPg6ehlYnHX3J7Gb62RtsXHnJhQ.png'] },
-  { name: 'Octapus', firstImage: '1KK3KonGmBcl1y96J6Uvnf4LU.png', images: ['1KK3KonGmBcl1y96J6Uvnf4LU.png', 'apply the aesthetic of@2  to @1  and make the design more realistic, don_t change the aspect and angle of @1.png'] },
+  { name: 'Octapus', firstImage: 'apply the aesthetic of@2  to @1  and make the design more realistic, don_t change the aspect and angle of @1.png', images: ['1KK3KonGmBcl1y96J6Uvnf4LU.png', 'apply the aesthetic of@2  to @1  and make the design more realistic, don_t change the aspect and angle of @1.png'] },
   { name: 'Onion', firstImage: '0f1b24164697117.63fcd3551e39e.png', images: ['0f1b24164697117.63fcd3551e39e.png', '16e020164697117.63fb9f23ce9a8.jpg', '47b897164697117.64aed32cca6a7.png', '8c3a85164697117.63fd1d19876e5.png', '9ec514164697117.64aed5efe4b5d.png', 'a09fa1164697117.64aed32ccc1ab.png', 'a7fe07164697117.63fba4a7e0e47.gif', 'apBGgK7PNcyyia6g5kk1NLWHo.png', 'bf55e6164697117.64afc6221cd98.png', 'c4013e164697117.63fc477a75df2.png', 'c6021b164697117.63fd1d19865f6.png', 'd89951164697117.63fd1d198304f.jpg'] },
   { name: 'Post-Purity', firstImage: '4x_apply the details of the red circled part of@2  to the red circled part of @1.png', images: ['4x_apply the details of the red circled part of@2  to the red circled part of @1.png', '4x_change teh pcb color from green to black, 添加顆粒感, change the lens from 50mm to 200mm.png'] },
   { name: 'Pulse', firstImage: '2x_use@2 as art direction, add motion blur but focus on the Cufflinks.png', images: ['2x_use@2 as art direction, add motion blur but focus on the Cufflinks.png'] },
   { name: 'Robin', firstImage: 'IMG_2566.JPG', images: ['IMG_2566.JPG'] },
-  { name: 'Sparkle', firstImage: '810ad1123263591.640819e2875ca.png', images: ['810ad1123263591.640819e2875ca.png', 'dfuns 2026-01-18 011459.746.jpg', 'rd6IPEfTi2wToWIW2Ns6x6oVQ.png'] },
+  { name: 'Sparkle', firstImage: '810ad1123263591.640819e2875ca.png', images: ['810ad1123263591.640819e2875ca.png', 'rd6IPEfTi2wToWIW2Ns6x6oVQ.png'] },
   { name: 'Stool', firstImage: '2x_Front - New view (2).png', images: ['2x_Front - New view (2).png', '2x_Front Left 3_4 View - New view.png', '2x_Left - New view.png', '2x_Top - New view (1).png', '2x_Top - New view (2).png', '4x_use the second image as reference, apply the art direction.png'] },
   { name: 'T4B', firstImage: '4x_Front - New view.png', images: ['4x_Front - New view.png', '4x_Left - New view.png', '4x_add sticker as decoration to the suitcase (1).png', '4x_make every detail more realistic, make the green sofa in light yellow (1)(1).png', '4x_make every detail more realistic, make the green sofa in light yellow (1).png', '4x_make every detail of the suitcase more realistic, use the detail of@2 as reference.png', '4x_place the red circled design in a empty room, use@2 as reference拷貝(1).png', '4x_place the red circled design in a empty room, use@2 as reference拷貝.png'] },
   { name: 'YO YO Cable Arranger', firstImage: '2x_merge this @2 with@1 , fully apply the form design of@1 (1).png', images: ['2x_merge this @2 with@1 , fully apply the form design of@1 (1).png', '4x_make the 3d printed material more realistic, it_s printed in Y axis, enhance the contrast (1).png', '4x_merge this @2 with@1 , apply the form design of@2.png', '4x_merge this @2 with@1 , create a portable wire arrange tool with the material and design of @2  , use the background color of @3 , textile wire.png', '4x_merge this @2 with@1 , fully apply the form design of@1.png'] },
@@ -73,10 +73,11 @@ const TICKER_FOLDERS = [
 const TICKER_BASE = 'assets/Ticker/';
 const TICKER_IMAGE_EXT = /\.(png|jpg|jpeg|gif|webp)$/i;
 const TICKER_REF_IMAGES = 5; // Nodes image count; duration scales so all folders scroll at same px/s
-function tickerImageUrl(folderName, filename) {
+function tickerImageUrl(folderName, filename, refreshTs) {
   const path = TICKER_BASE + folderName + '/' + filename;
   const encoded = path.replace(/ /g, '%20').replace(/@/g, '%40').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/,/g, '%2C').replace(/#/g, '%23').replace(/\?/g, '%3F').replace(/&/g, '%26');
-  return ASSET_BASE + encoded;
+  const url = ASSET_BASE + encoded;
+  return refreshTs != null ? url + (url.includes('?') ? '&' : '?') + '_=' + refreshTs : url;
 }
 function tickerImagesOnly(images) {
   return images.filter((f) => TICKER_IMAGE_EXT.test(f));
@@ -101,7 +102,14 @@ const SCALE_LERP_RING = 0.09;    // 周圍延後（neighbor scale-up speed)
 const SCALE_LERP_RETURN_MOVING = 0.015;  // 游標移動時縮回更慢
 const POINTER_MOVE_THRESHOLD = 1.5;   // px per frame = cursor moving
 const SCROLL_THRESHOLD = 80;
+const TICKER_SCROLL_IDLE_MS = 0;    // show ticker immediately when in arc mode (no idle delay)
+const ARC_SNAP_IDLE_MS = 25;       // snap highlighted ball to vertical center after this long without scroll (0.025s)
+const ARC_SNAP_TO_CENTER_MS = 180;   // snappy scroll so highlighted ball is at vertical center
 let scrollMode = 0;  // 0 grid, 2 aligned vertical line
+let lastUserScrollTime = 0;
+let didSnapToCenterThisIdle = false;
+let snapScrollRAF = null;
+let isProgrammaticScroll = false;
 
 // Tuning: applied settings (control panel removed)
 const tuning = {
@@ -131,83 +139,355 @@ let prevPointerX = 0;
 let prevPointerY = 0;
 let pointerActive = false;
 let arcTickerPanel = null;
-let arcTickerTrack = null;
+let carouselViewport = null;
+let arcTickerTrack = null;  // carousel track (for visibility check)
 let lastTickerFolderIndex = -1;
-let arcTickerSettledSince = 0;  // ms when 90% of balls became settled; 0 = not yet
-const ARC_TICKER_SETTLE_MS = 120;  // hold 90% settled this long before showing
+let arcTickerSettledSince = 0;
+const ARC_TICKER_SETTLE_MS = 120;
 const ARC_TICKER_PCT_SETTLED = 0.5;
 const ARC_TICKER_SETTLE_SPEED = 0.4;
 const ARC_TICKER_SETTLE_DIST = 10;
 
-const TICKER_FADE_MS = 280;
+const TICKER_FADE_MS = 520;
+
+// Carousel state (infinite, draggable)
+let carouselIndex = 0;
+let carouselN = 0;
+let carouselCardWidthPx = 0;
+let carouselDragStartX = 0;
+let carouselDragStartOffset = 0;
+let carouselIsDragging = false;
+const CAROUSEL_AUTOPLAY_MS = 1500;
+const CAROUSEL_RESUME_AFTER_CLICK_MS = 4000;
+let carouselAutoplayId = null;
+let carouselResumeTimeoutId = null;
+let carouselBtnPrev = null;
+let carouselBtnNext = null;
+
+let carouselPosition = 0;  // visual position 0..n (n = clone of first for seamless loop right)
+
+function applyCarouselOffset(offsetPx, noTransition) {
+  if (!arcTickerTrack) return;
+  arcTickerTrack.style.transition = (noTransition || carouselIsDragging) ? 'none' : 'transform 0.35s ease-out';
+  arcTickerTrack.style.transform = `translateX(${offsetPx}px)`;
+}
+
+function triggerCarouselCardFadeIn(opts) {
+  if (!arcTickerTrack || carouselN <= 0) return;
+  const slow = opts && opts.slow;
+  const fromPosition = opts && opts.fromPosition;
+  const cards = arcTickerTrack.querySelectorAll('.carousel-card');
+  cards.forEach((el) => {
+    el.classList.remove('carousel-card-fade-in', 'carousel-card-fade-in-slow', 'carousel-card-fade-out', 'carousel-card-fade-out-slow');
+  });
+  const durationMs = slow ? 1450 : 380;
+  // Fade out the current (old) card so we transition to the next
+  if (fromPosition != null) {
+    const oldCard = arcTickerTrack.children[fromPosition];
+    if (oldCard && oldCard.classList.contains('carousel-card')) {
+      oldCard.classList.add(slow ? 'carousel-card-fade-out-slow' : 'carousel-card-fade-out');
+      const oldImg = oldCard.querySelector('img');
+      const removeOld = () => {
+        oldCard.classList.remove('carousel-card-fade-out', 'carousel-card-fade-out-slow');
+        if (oldImg) oldImg.removeEventListener('animationend', removeOld);
+      };
+      if (oldImg) oldImg.addEventListener('animationend', removeOld, { once: true });
+      else setTimeout(removeOld, durationMs);
+    }
+  }
+  // Fade in the next (new) card
+  const visible = arcTickerTrack.children[carouselPosition];
+  if (visible && visible.classList.contains('carousel-card')) {
+    visible.classList.add(slow ? 'carousel-card-fade-in-slow' : 'carousel-card-fade-in');
+    const img = visible.querySelector('img');
+    const removeClass = () => {
+      visible.classList.remove('carousel-card-fade-in', 'carousel-card-fade-in-slow');
+      if (img) img.removeEventListener('animationend', removeClass);
+    };
+    if (img) img.addEventListener('animationend', removeClass, { once: true });
+    else setTimeout(removeClass, durationMs);
+  }
+}
+
+function carouselGoToSlide(index) {
+  if (carouselN <= 0) return;
+  const n = carouselN;
+  const wrapped = ((index % n) + n) % n;
+  // Track layout: [clone(last), card0, ..., card(n-1), clone(first)]. Position 0 = clone last, 1..n = real 0..n-1, n+1 = clone first.
+  // Going "next" from last: animate to position n+1 (clone first), then reset to position 1
+  if (index >= n && carouselPosition === n) {
+    carouselPosition = n + 1;
+    carouselIndex = n - 1;
+    applyCarouselOffset(-carouselPosition * carouselCardWidthPx, false);
+    const onEnd = () => {
+      arcTickerTrack.removeEventListener('transitionend', onEnd);
+      carouselPosition = 1;
+      carouselIndex = 0;
+      arcTickerTrack.style.transition = 'none';
+      arcTickerTrack.style.transform = `translateX(${-1 * carouselCardWidthPx}px)`;
+      void arcTickerTrack.offsetHeight; // force reflow so reset paints without extra frame
+      updateCarouselButtonIconColor();
+      // No fade here: we jumped to same image (real first = clone first), fade would look like current re-fading
+    };
+    arcTickerTrack.addEventListener('transitionend', onEnd);
+    return;
+  }
+  // Going "prev" from first: animate to position 0 (clone last), then reset to position n
+  if (index < 0 && carouselPosition === 1) {
+    carouselPosition = 0;
+    carouselIndex = 0;
+    applyCarouselOffset(0, false);
+    const onEnd = () => {
+      arcTickerTrack.removeEventListener('transitionend', onEnd);
+      carouselPosition = n;
+      carouselIndex = n - 1;
+      arcTickerTrack.style.transition = 'none';
+      arcTickerTrack.style.transform = `translateX(${-n * carouselCardWidthPx}px)`;
+      void arcTickerTrack.offsetHeight; // force reflow so reset paints without extra frame
+      updateCarouselButtonIconColor();
+      // No fade here: we jumped to same image (real last = clone last)
+    };
+    arcTickerTrack.addEventListener('transitionend', onEnd);
+    return;
+  }
+  // If we're on a clone, reset to the real card first (instant)
+  if (carouselPosition === 0) {
+    carouselPosition = n;
+    carouselIndex = n - 1;
+    applyCarouselOffset(-n * carouselCardWidthPx, true);
+  }
+  if (carouselPosition === n + 1) {
+    carouselPosition = 1;
+    carouselIndex = 0;
+    applyCarouselOffset(-1 * carouselCardWidthPx, true);
+  }
+  const fromPos = carouselPosition;
+  carouselIndex = wrapped;
+  carouselPosition = wrapped + 1;  // position 1 = logical 0
+  applyCarouselOffset(-carouselPosition * carouselCardWidthPx);
+  requestAnimationFrame(() => {
+    updateCarouselButtonIconColor();
+    triggerCarouselCardFadeIn({ fromPosition: fromPos });
+  });
+}
+
+function carouselStartAutoplay() {
+  if (carouselAutoplayId) clearInterval(carouselAutoplayId);
+  carouselAutoplayId = setInterval(() => carouselGoToSlide(carouselIndex + 1), CAROUSEL_AUTOPLAY_MS);
+}
+
+function carouselOnControlClick() {
+  if (carouselResumeTimeoutId) clearTimeout(carouselResumeTimeoutId);
+  if (carouselAutoplayId) clearInterval(carouselAutoplayId);
+  carouselAutoplayId = null;
+  carouselResumeTimeoutId = setTimeout(() => {
+    carouselResumeTimeoutId = null;
+    carouselStartAutoplay();
+  }, CAROUSEL_RESUME_AFTER_CLICK_MS);
+}
+
+function sampleLuminance(img, leftFraction, rightFraction) {
+  if (!img || !img.complete || img.naturalWidth === 0) return { left: 255, right: 255 };
+  try {
+    const c = document.createElement('canvas');
+    const w = Math.min(100, img.naturalWidth);
+    const h = Math.round((img.naturalHeight / img.naturalWidth) * w);
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext('2d');
+    if (!ctx) return { left: 255, right: 255 };
+    ctx.drawImage(img, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h);
+    const leftStrip = Math.max(1, Math.floor(w * (leftFraction || 0.15)));
+    const rightStrip = Math.max(1, Math.floor(w * (rightFraction || 0.15)));
+    let leftSum = 0, rightSum = 0, leftCount = 0, rightCount = 0;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < leftStrip; x++) {
+        const i = (y * w + x) * 4;
+        leftSum += 0.299 * data.data[i] + 0.587 * data.data[i + 1] + 0.114 * data.data[i + 2];
+        leftCount++;
+      }
+      for (let x = w - rightStrip; x < w; x++) {
+        const i = (y * w + x) * 4;
+        rightSum += 0.299 * data.data[i] + 0.587 * data.data[i + 1] + 0.114 * data.data[i + 2];
+        rightCount++;
+      }
+    }
+    return {
+      left: leftCount ? leftSum / leftCount : 255,
+      right: rightCount ? rightSum / rightCount : 255
+    };
+  } catch (e) {
+    return { left: 255, right: 255 };
+  }
+}
+
+function updateCarouselButtonIconColor() {
+  if (!carouselBtnPrev || !carouselBtnNext || !arcTickerTrack || carouselN <= 0) return;
+  const card = arcTickerTrack.children[carouselPosition];
+  const img = card ? card.querySelector('img') : null;
+  const lum = sampleLuminance(img, 0.15, 0.15);
+  const darkThreshold = 140;
+  carouselBtnPrev.classList.toggle('dark-bg', lum.left < darkThreshold);
+  carouselBtnNext.classList.toggle('dark-bg', lum.right < darkThreshold);
+}
 
 function setTickerContent(folderIndex) {
-  if (!arcTickerTrack || folderIndex < 0 || folderIndex >= TICKER_FOLDERS.length) return;
+  if (!arcTickerTrack || !carouselViewport || folderIndex < 0 || folderIndex >= TICKER_FOLDERS.length) return;
   const folder = TICKER_FOLDERS[folderIndex];
   if (!folder || !folder.images.length) return;
   const images = tickerImagesOnly(folder.images);
   if (!images.length) return;
   const n = images.length;
-  const gap = 8;
   const hasExisting = arcTickerTrack.children.length > 0;
 
   function buildContent() {
     arcTickerTrack.innerHTML = '';
-    arcTickerTrack.style.animation = 'none';
-    arcTickerTrack.style.opacity = '0';
-    const repeat = 3;
-    let loaded = 0;
-    const items = [];
+    arcTickerTrack.classList.remove('is-dragging');
+    carouselIsDragging = false;
+    const refreshTs = Date.now(); // cache-bust so images reload on each build
+    const viewportWidth = carouselViewport.offsetWidth || 400;
+    carouselCardWidthPx = Math.floor(viewportWidth); // integer px to avoid right-edge sub-pixel flicker
+    carouselN = n;
+    carouselIndex = 0;
+    carouselPosition = 1;  // position 1 = first real card (track[1])
+    const totalCards = n + 2;  // + clone of last at start, + clone of first at end
+    arcTickerTrack.style.width = `${totalCards * carouselCardWidthPx}px`;
+    arcTickerTrack.style.transform = `translateX(${-carouselCardWidthPx}px)`;  // show position 1 (first card)
+    arcTickerTrack.style.transition = 'transform 0.35s ease-out';
 
-    function measureAndStart() {
-      loaded++;
-      if (loaded < n) return;
-      const firstSetWidth = items.slice(0, n).reduce((sum, el) => sum + (el.offsetWidth || 0), 0) + gap * Math.max(0, n - 1);
-      arcTickerTrack.style.setProperty('--ticker-offset', `-${firstSetWidth}px`);
-      const durationSec = (10 / TICKER_REF_IMAGES) * n;
-      arcTickerTrack.style.animation = `arc-ticker-scroll ${durationSec}s linear infinite`;
-      requestAnimationFrame(() => {
-        arcTickerTrack.style.opacity = '1';
-      });
-    }
+    // Clone of LAST at start so "prev" from first animates left to clone, then we reset (no right jump)
+    const lastFilename = images[n - 1];
+    const cloneLastCard = document.createElement('div');
+    cloneLastCard.className = 'carousel-card';
+    cloneLastCard.style.width = `${carouselCardWidthPx}px`;
+    const imgLast = document.createElement('img');
+    imgLast.src = tickerImageUrl(folder.name, lastFilename, refreshTs);
+    imgLast.alt = '';
+    imgLast.decoding = 'async';
+    cloneLastCard.appendChild(imgLast);
+    arcTickerTrack.appendChild(cloneLastCard);
 
-    for (let r = 0; r < repeat; r++) {
-      const isFirstSet = r === 0;
-      images.forEach((filename, i) => {
-        const item = document.createElement('div');
-        item.className = 'arc-ticker-item';
-        const img = document.createElement('img');
-        const url = tickerImageUrl(folder.name, filename);
-        img.alt = '';
-        img.decoding = 'async';
-        img.loading = isFirstSet ? 'eager' : 'lazy';
-        img.src = url;
-        if (isFirstSet && i < n) items.push(item);
-        img.onload = measureAndStart;
-        img.onerror = measureAndStart;
-        item.appendChild(img);
-        arcTickerTrack.appendChild(item);
-      });
+    images.forEach((filename, i) => {
+      const card = document.createElement('div');
+      card.className = 'carousel-card';
+      card.style.width = `${carouselCardWidthPx}px`;
+      const img = document.createElement('img');
+      img.src = tickerImageUrl(folder.name, filename, refreshTs);
+      img.alt = '';
+      img.decoding = 'async';
+      img.loading = i < 3 ? 'eager' : 'lazy';
+      card.appendChild(img);
+      arcTickerTrack.appendChild(card);
+    });
+    // Clone first card at end so "next" from last animates right to clone, then we reset (no left jump)
+    const firstCard = arcTickerTrack.children[1];
+    if (firstCard) {
+      const clone = firstCard.cloneNode(true);
+      arcTickerTrack.appendChild(clone);
     }
-    if (items.length < n) {
-      requestAnimationFrame(() => {
-        const firstSetWidth = items.reduce((sum, el) => sum + (el.offsetWidth || 0), 0) + gap * Math.max(0, n - 1);
-        arcTickerTrack.style.setProperty('--ticker-offset', `-${firstSetWidth}px`);
-        arcTickerTrack.style.animation = `arc-ticker-scroll ${(10 / TICKER_REF_IMAGES) * n}s linear infinite`;
-        arcTickerTrack.style.opacity = '1';
-      });
+    requestAnimationFrame(() => triggerCarouselCardFadeIn());
+
+    // Drag
+    function onPointerDown(e) {
+      if (e.button !== 0 && e.type === 'mousedown') return;
+      carouselIsDragging = true;
+      carouselDragStartX = e.clientX;
+      const tx = arcTickerTrack.style.transform;
+      const match = /translateX\(([-\d.]+)px\)/.exec(tx);
+      carouselDragStartOffset = match ? parseFloat(match[1]) : -carouselPosition * carouselCardWidthPx;
+      arcTickerTrack.classList.add('is-dragging');
+      e.preventDefault();
     }
+    function onPointerMove(e) {
+      if (!carouselIsDragging) return;
+      const dx = e.clientX - carouselDragStartX;
+      applyCarouselOffset(carouselDragStartOffset + dx);
+    }
+    function onPointerUp() {
+      if (!carouselIsDragging) return;
+      carouselIsDragging = false;
+      arcTickerTrack.classList.remove('is-dragging');
+      const fromPos = carouselPosition;
+      const tx = arcTickerTrack.style.transform;
+      const match = /translateX\(([-\d.]+)px\)/.exec(tx);
+      const currentOffset = match ? parseFloat(match[1]) : 0;
+      const nearest = Math.round(-currentOffset / carouselCardWidthPx);
+      if (nearest === 0) {
+        carouselPosition = carouselN;
+        carouselIndex = carouselN - 1;
+        applyCarouselOffset(-carouselN * carouselCardWidthPx, true);
+      } else if (nearest === carouselN + 1) {
+        carouselPosition = 1;
+        carouselIndex = 0;
+        applyCarouselOffset(-1 * carouselCardWidthPx, true);
+      } else {
+        const pos = Math.max(1, Math.min(carouselN, nearest));
+        carouselIndex = pos - 1;
+        carouselPosition = pos;
+        applyCarouselOffset(-carouselPosition * carouselCardWidthPx);
+      }
+      updateCarouselButtonIconColor();
+      triggerCarouselCardFadeIn({ fromPosition: fromPos });
+      carouselOnControlClick();
+    }
+    arcTickerTrack.onpointerdown = onPointerDown;
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+    arcTickerTrack._carouselCleanup = () => {
+      if (carouselAutoplayId) clearInterval(carouselAutoplayId);
+      carouselAutoplayId = null;
+      if (carouselResumeTimeoutId) clearTimeout(carouselResumeTimeoutId);
+      carouselResumeTimeoutId = null;
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      arcTickerTrack.onpointerdown = null;
+    };
+    carouselStartAutoplay();
+    setTimeout(updateCarouselButtonIconColor, 350);
   }
 
-  if (hasExisting) {
-    arcTickerTrack.style.opacity = '0';
-    arcTickerTrack.style.transition = `opacity ${TICKER_FADE_MS}ms ease`;
+  if (hasExisting && arcTickerTrack._carouselCleanup) {
+    arcTickerTrack._carouselCleanup();
+    arcTickerPanel.style.opacity = '0';
+    arcTickerPanel.style.transition = `opacity ${TICKER_FADE_MS}ms ease`;
     setTimeout(() => {
       buildContent();
+      requestAnimationFrame(() => {
+        arcTickerPanel.style.opacity = '';
+        arcTickerPanel.style.transition = '';
+      });
     }, TICKER_FADE_MS);
   } else {
     buildContent();
   }
+}
+
+function snapArcBallToCenter(highlightedBubble) {
+  if (!bubbleAreaEl || !highlightedBubble || snapScrollRAF) return;
+  const targetScrollY = bubbleAreaEl.offsetTop + highlightedBubble.restY - window.innerHeight / 2;
+  const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const clamped = Math.max(0, Math.min(maxScroll, targetScrollY));
+  const startY = window.scrollY;
+  const dist = clamped - startY;
+  if (Math.abs(dist) < 2) return;
+  isProgrammaticScroll = true;
+  const startTime = performance.now();
+  const duration = ARC_SNAP_TO_CENTER_MS;
+  function tick(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    const ease = 1 - (1 - t) * (1 - t);  // easeOutQuad
+    window.scrollTo(0, startY + dist * ease);
+    if (t < 1) {
+      snapScrollRAF = requestAnimationFrame(tick);
+    } else {
+      snapScrollRAF = null;
+      isProgrammaticScroll = false;
+    }
+  }
+  snapScrollRAF = requestAnimationFrame(tick);
 }
 
 function init() {
@@ -231,13 +511,42 @@ function init() {
 
   window.addEventListener('resize', onResize);
 
-  // Right-half ticker panel: content set by highlighted bubble's folder in arc mode
+  // Right-half panel: draggable infinite carousel with prev/next buttons
   arcTickerPanel = document.createElement('div');
   arcTickerPanel.className = 'arc-ticker-panel';
   arcTickerPanel.setAttribute('aria-hidden', 'true');
+  carouselViewport = document.createElement('div');
+  carouselViewport.className = 'carousel-viewport';
   arcTickerTrack = document.createElement('div');
-  arcTickerTrack.className = 'arc-ticker-track';
-  arcTickerPanel.appendChild(arcTickerTrack);
+  arcTickerTrack.className = 'carousel-track';
+  carouselViewport.appendChild(arcTickerTrack);
+  arcTickerPanel.appendChild(carouselViewport);
+
+  carouselBtnPrev = document.createElement('button');
+  carouselBtnPrev.type = 'button';
+  carouselBtnPrev.className = 'carousel-nav carousel-nav-prev';
+  carouselBtnPrev.setAttribute('aria-label', 'Previous');
+  carouselBtnPrev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>';
+  carouselBtnPrev.onclick = () => { carouselGoToSlide(carouselIndex - 1); carouselOnControlClick(); };
+  carouselBtnNext = document.createElement('button');
+  carouselBtnNext.type = 'button';
+  carouselBtnNext.className = 'carousel-nav carousel-nav-next';
+  carouselBtnNext.setAttribute('aria-label', 'Next');
+  carouselBtnNext.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  carouselBtnNext.onclick = () => { carouselGoToSlide(carouselIndex + 1); carouselOnControlClick(); };
+  arcTickerPanel.appendChild(carouselBtnPrev);
+  arcTickerPanel.appendChild(carouselBtnNext);
+
+  new ResizeObserver(() => {
+    if (carouselN > 0 && carouselViewport && arcTickerTrack.children.length) {
+      const w = Math.floor(carouselViewport.offsetWidth || 400);
+      carouselCardWidthPx = w;
+      arcTickerTrack.style.width = `${(carouselN + 2) * w}px`;
+      arcTickerTrack.querySelectorAll('.carousel-card').forEach((el) => { el.style.width = `${w}px`; });
+      applyCarouselOffset(-carouselPosition * w, true);
+    }
+  }).observe(carouselViewport);
+
   document.body.appendChild(arcTickerPanel);
 
   bubbleAreaEl.addEventListener('pointermove', (e) => {
@@ -255,6 +564,12 @@ function init() {
   });
 
   window.addEventListener('scroll', () => {
+    if (isProgrammaticScroll) return;
+    lastUserScrollTime = performance.now();
+    didSnapToCenterThisIdle = false;
+    if (snapScrollRAF) cancelAnimationFrame(snapScrollRAF);
+    snapScrollRAF = null;
+    if (arcTickerPanel) arcTickerPanel.classList.remove('is-visible');
     if (window.scrollY <= SCROLL_THRESHOLD) {
       const fromArc = scrollMode === 2;
       scrollMode = 0;
@@ -353,6 +668,7 @@ function buildHexBubbles() {
   const w2 = rect.width || window.innerWidth;
   const h2 = getLayoutHeight();
   layoutPoints = computePolarGridPoints(step, viewCenterX, viewCenterY, w2, h2).slice(0, NUM_CIRCLES);
+  layoutPoints.sort((a, b) => a.y - b.y);  // top-to-bottom order = bubble index order for shortest transition to arc
   const totalBubbles = getTotalBubbles();
 
   const current = bubbles.length;
@@ -393,6 +709,7 @@ function updateRestPositions(areaWidth, areaHeight, fromArc) {
   currentRadius = layout.currentRadius * tuning.ballSize;
   const { step, viewCenterX, viewCenterY } = layout;
   layoutPoints = computePolarGridPoints(step, viewCenterX, viewCenterY, areaWidth, areaHeight).slice(0, NUM_CIRCLES);
+  layoutPoints.sort((a, b) => a.y - b.y);  // top-to-bottom = same order as arc for shortest transition
   const totalBubbles = getTotalBubbles();
   if (fromArc && bubbles.length > 0) {
     const sortedByArcY = bubbles.map((_, i) => i).sort((a, b) => bubbles[a].restY - bubbles[b].restY);
@@ -451,10 +768,9 @@ function updateRestToVerticalLine() {
   const cy = firstBallY + arcSpanY / 2;
   const cx = refX - R;
 
-  // Shortest-path arrangement: assign arc slots by current (grid) Y order so top ball → top of arc
-  const sortedByY = bubbles.map((_, i) => i).sort((a, b) => bubbles[a].restY - bubbles[b].restY);
+  // Arc order = project list order (bubble index 0 at top, 1 next, …) so balls match the image list
   const arcSlot = new Int32Array(n);
-  sortedByY.forEach((bubbleIndex, slot) => { arcSlot[bubbleIndex] = slot; });
+  for (let i = 0; i < n; i++) arcSlot[i] = i;
 
   const arcX = [];
   const arcY = [];
@@ -507,6 +823,12 @@ function createBubbleEl(project, data, bubbleIndex) {
 
   hitArea.addEventListener('mouseenter', () => setHovered(data));
   hitArea.addEventListener('mouseleave', () => setHovered(null));
+  hitArea.addEventListener('click', (e) => {
+    if (scrollMode === 2 && wrap) {
+    e.preventDefault();
+      wrap.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  });
 
   return wrap;
 }
@@ -571,6 +893,9 @@ function physicsLoop() {
     }
   });
 
+  // Arc mode: don't move hovered ball to cursor (spring/pull/overlap all use rest for it)
+  const followCursor = hoveredBubble && scrollMode !== 2;
+
   // Forces: spring to rest + repulsion
   const fx = new Float64Array(n);
   const fy = new Float64Array(n);
@@ -579,9 +904,9 @@ function physicsLoop() {
   for (let i = 0; i < n; i++) {
     const a = bubbles[i];
     const rA = currentRadius * Math.abs(a.scale);
-    // Hovered ball snaps to cursor; others snap to rest
-    const targetX = a === hoveredBubble ? pointerX : a.restX;
-    const targetY = a === hoveredBubble ? pointerY : a.restY;
+    // Hovered ball snaps to cursor (grid only); others snap to rest
+    const targetX = (a === hoveredBubble && followCursor) ? pointerX : a.restX;
+    const targetY = (a === hoveredBubble && followCursor) ? pointerY : a.restY;
     fx[i] = kRest * (targetX - a.x);
     fy[i] = kRest * (targetY - a.y);
 
@@ -616,12 +941,13 @@ function physicsLoop() {
   // Grid mode: no hard pin so balls can ease back naturally; hovered stays at rest later
   // (removed: pin all to rest here — let spring + pullLerp do a slower, natural snap)
 
-  // Pull: hovered ball toward cursor, others toward rest
+  // Pull: hovered ball toward cursor, others toward rest (in arc mode don't pull hovered at all)
   const SNAP_RADIUS = 2;
   const SNAP_SPEED = 0.8;
   const basePullLerp = scrollMode === 2 ? 0.078 : tuning.pullLerp;
   const pullLerp = basePullLerp * tuning.snapback;
   bubbles.forEach((b) => {
+    if (scrollMode === 2 && b === hoveredBubble) return;
     const targetX = b === hoveredBubble ? pointerX : b.restX;
     const targetY = b === hoveredBubble ? pointerY : b.restY;
     b.x += (targetX - b.x) * pullLerp;
@@ -718,7 +1044,13 @@ function physicsLoop() {
       });
 
       const now = performance.now();
-      if (ninetyPctSettled && highlightedBubble) {
+      const scrollIdleLongEnough = (now - lastUserScrollTime) >= TICKER_SCROLL_IDLE_MS;
+      const snapIdleLongEnough = (now - lastUserScrollTime) >= ARC_SNAP_IDLE_MS;
+      if (snapIdleLongEnough && highlightedBubble && !didSnapToCenterThisIdle) {
+        snapArcBallToCenter(highlightedBubble);
+        didSnapToCenterThisIdle = true;
+      }
+      if (ninetyPctSettled && highlightedBubble && scrollIdleLongEnough) {
         if (arcTickerSettledSince === 0) arcTickerSettledSince = now;
         const elapsed = now - arcTickerSettledSince;
         if (elapsed >= ARC_TICKER_SETTLE_MS) {
@@ -742,13 +1074,13 @@ function physicsLoop() {
     }
   }
 
-  // Position correction: resolve overlaps; hovered ball stays fixed at center, others get pushed
+  // Position correction: resolve overlaps; hovered ball fixed (grid only), others get pushed
   function resolveOverlaps() {
     for (let iter = 0; iter < tuning.overlapIter; iter++) {
       for (let i = 0; i < n; i++) {
         const a = bubbles[i];
         const rA = currentRadius * Math.abs(a.scale);
-        const aFixed = a === hoveredBubble;
+        const aFixed = a === hoveredBubble && followCursor;
         for (let j = i + 1; j < n; j++) {
           const b = bubbles[j];
           const rB = currentRadius * Math.abs(b.scale);
@@ -758,7 +1090,7 @@ function physicsLoop() {
             const overlap = minD - d;
             const nx = (a.x - b.x) / d;
             const ny = (a.y - b.y) / d;
-            const bFixed = b === hoveredBubble;
+            const bFixed = b === hoveredBubble && followCursor;
             if (aFixed) {
               b.x -= nx * overlap;
               b.y -= ny * overlap;
@@ -818,6 +1150,7 @@ function onResize() {
   // Recompute polar grid so counts are correct on resize
   const layout = getCircleLayout(w, h);
   layoutPoints = computePolarGridPoints(layout.step, layout.viewCenterX, layout.viewCenterY, w, h).slice(0, NUM_CIRCLES);
+  layoutPoints.sort((a, b) => a.y - b.y);
   const totalBubbles = getTotalBubbles();
   if (bubbles.length < totalBubbles) {
     buildHexBubbles();

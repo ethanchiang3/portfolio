@@ -34,6 +34,26 @@ body {
   position: relative;
 }
 
+/* Fade to white at top and bottom in arc (aligned) mode — left panel only, not the ticker */
+.vita-livearea:has(.vita-bubble-area.vita-aligned-line)::before,
+.vita-livearea:has(.vita-bubble-area.vita-aligned-line)::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 50%;
+  height: 140px;
+  pointer-events: none;
+  z-index: 5;
+}
+.vita-livearea:has(.vita-bubble-area.vita-aligned-line)::before {
+  top: 0;
+  background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,0) 100%);
+}
+.vita-livearea:has(.vita-bubble-area.vita-aligned-line)::after {
+  bottom: 0;
+  background: linear-gradient(to top, #fff 0%, rgba(255,255,255,0) 100%);
+}
+
 /* ----- Name in top left corner ----- */
 .vita-name {
   position: fixed;
@@ -44,7 +64,7 @@ body {
   font-size: 1.25rem;
   font-weight: 400;
   color: var(--vita-text);
-  z-index: 2;
+  z-index: 10;
   pointer-events: none;
 }
 
@@ -251,55 +271,132 @@ body {
   color: #cfd8dc;
 }
 
-/* ----- Arc ticker: band between red lines (top/bottom ~33%), same height, variable width, scale to fit ----- */
+/* ----- Arc panel: draggable infinite carousel with prev/next buttons ----- */
 .arc-ticker-panel {
   position: fixed;
   right: 0;
   top: 10vh;
   bottom: 10vh;
   width: 50%;
-  overflow: hidden;
-  pointer-events: none;
+  overflow: visible;
   z-index: 1;
   opacity: 0;
   transition: opacity 0.4s ease;
+  background: #fff;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 .arc-ticker-panel.is-visible {
   opacity: 1;
+  pointer-events: auto;
 }
-.arc-ticker-track {
-  --ticker-offset: -888px; /* set by JS after images load */
-  background: #fff;
-  transition: opacity 0.28s ease;
+.carousel-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-y pinch-zoom;
+  contain: layout paint;
+  min-width: 0;
+}
+.carousel-track {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   height: 100%;
-  gap: 8px;
-  padding: 0 24px;
-  animation: arc-ticker-scroll 10s linear infinite;
-  width: max-content;
+  will-change: transform;
+  cursor: grab;
+  user-select: none;
+  backface-visibility: hidden;
 }
-.arc-ticker-item {
-  flex-shrink: 0;
+.carousel-track.is-dragging {
+  cursor: grabbing;
+  transition: none;
+}
+.carousel-card {
+  flex: 0 0 auto;
   height: 100%;
-  width: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  box-sizing: border-box;
+  background: #fff;
 }
-.arc-ticker-item img {
+.carousel-card img {
+  width: 100%;
   height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
   display: block;
-  vertical-align: middle;
+  pointer-events: none;
 }
-@keyframes arc-ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(var(--ticker-offset)); }
+.carousel-card.carousel-card-fade-in img {
+  animation: carousel-image-fade-in 0.35s ease-out both;
+}
+.carousel-card.carousel-card-fade-in-slow img {
+  animation: carousel-image-fade-in-slow 1.4s ease-out both;
+}
+.carousel-card.carousel-card-fade-out img {
+  animation: carousel-image-fade-out 0.35s ease-out forwards;
+}
+.carousel-card.carousel-card-fade-out-slow img {
+  animation: carousel-image-fade-out-slow 1.4s ease-out forwards;
+}
+@keyframes carousel-image-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes carousel-image-fade-in-slow {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes carousel-image-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes carousel-image-fade-out-slow {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.carousel-nav {
+  position: absolute;
+  bottom: -28px;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  -webkit-tap-highlight-color: transparent;
+}
+.carousel-nav:hover {
+  background: transparent;
+}
+.carousel-nav:active {
+  background: transparent;
+}
+.carousel-nav-prev {
+  left: 0;
+}
+.carousel-nav-next {
+  left: auto;
+  right: 0;
+}
+.carousel-nav svg {
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+.carousel-nav.dark-bg svg {
+  color: #fff;
 }
 
 @media (max-width: 600px) {
