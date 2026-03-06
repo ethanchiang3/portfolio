@@ -42,7 +42,11 @@ const PROJECTS = [
   },
 ];
 
-const TOTAL_BUBBLES = 25;   // 5×5 共 25 顆球
+function getTotalBubbles() {
+  const cols = Math.max(1, Math.min(20, Math.round(tuning.hexCols)));
+  const rows = Math.max(1, Math.min(20, Math.round(tuning.hexRows)));
+  return cols * rows;
+}
 
 const BUBBLE_IMAGES = [
   'assets/3A927DB1-F317-47BF-BA00-4A6DF368173B-8a6cc66b-7b25-40d2-a3aa-a3cee59fbba0.png',
@@ -62,31 +66,46 @@ const BUBBLE_IMAGES = [
 const ASSET_BASE = window.__ASSET_BASE__ || '';
 const PADDING = 20;
 const EDGE_BUFFER = 28;
-const HOVER_SCALE = 1.5;
 let currentRadius = 44;     // 依視窗計算，使 30 球填滿
 
-// Physics
+// Physics (defaults; overridden by tuning sliders)
 const DT = 1 / 60;
 const MASS = 1;
-const K_REST = 52;         // very strong spring: return to og position fast
-const K_REPEL = 1.12;      // strong repulsion so balls never overlap
-const DAMPING = 0.88;      // allow overshoot so fast pull-back causes visible shake
-const OVERLAP_ITERATIONS = 10;  // more passes so overlap is fully resolved
 const TOUCH_DIST_FACTOR = 1.08;   // 依接觸算鄰居（略大於直徑）
-const RING_SCALE = [1, 0.28, 0.1, 0.04];   // 鄰球放大較小，減少波及
-const GRID_SHRINK_SCALE = 0.62;            // grid 下非鄰居縮小，避免碰撞
-const SCALE_LERP_CENTER = 0.22;  // 第一顆先放大（較快）
-const SCALE_LERP_RING = 0.09;    // 周圍延後、往外擴散（較慢）
-const SCALE_LERP_RETURN = 0.04;  // 縮回原尺寸較慢
-// Scroll modes: 0 = grid, 2 = aligned (vertical line) — no stack-on-bottom state
+const RING_NEIGHBOR_DIST_FACTOR = 1.65;  // ring includes near balls (not just touching)
+const SCALE_LERP_RING = 0.09;    // 周圍延後（neighbor scale-up speed)
+const SCALE_LERP_RETURN_MOVING = 0.015;  // 游標移動時縮回更慢
+const POINTER_MOVE_THRESHOLD = 1.5;   // px per frame = cursor moving
 const SCROLL_THRESHOLD = 80;
 let scrollMode = 0;  // 0 grid, 2 aligned vertical line
+
+// Tuning: all slider-driven (wider ranges)
+const tuning = {
+  ballSize: 1,
+  snapback: 1.01,
+  hoverScale: 1.35,
+  spring: 22,
+  damping: 0.91,
+  gridShrink: 0.5,
+  ring1: 0.1,
+  ring2: 0.05,
+  scaleUp: 0.22,
+  scaleReturn: 0.041,
+  repel: 1.1,
+  overlapIter: 10,
+  pullLerp: 0.061,
+  hexCols: 5,
+  hexRows: 5,
+  ogDistance: 0.65,
+};
 
 let bubbleAreaEl;
 let bubbles = [];
 let hoveredBubble = null;
 let pointerX = 0;
 let pointerY = 0;
+let prevPointerX = 0;
+let prevPointerY = 0;
 let pointerActive = false;
 
 function init() {
@@ -124,33 +143,93 @@ function init() {
     }
   }, { passive: true });
 
+  function layoutOnChange() {
+    const r = bubbleAreaEl.getBoundingClientRect();
+    buildHexBubbles();
+    updateRestPositions(r.width || window.innerWidth, getLayoutHeight());
+  }
+  // Control panel hide / show
+  const tuningPanel = document.getElementById('tuningPanel');
+  const tuningPanelHide = document.getElementById('tuningPanelHide');
+  const tuningPanelShow = document.getElementById('tuningPanelShow');
+  if (tuningPanel && tuningPanelHide && tuningPanelShow) {
+    tuningPanelHide.addEventListener('click', () => {
+      tuningPanel.classList.add('is-hidden');
+      tuningPanelShow.removeAttribute('hidden');
+    });
+    tuningPanelShow.addEventListener('click', () => {
+      tuningPanel.classList.remove('is-hidden');
+      tuningPanelShow.setAttribute('hidden', '');
+    });
+  }
+  // Tuning sliders: rows, cols, og distance + all params (wide ranges including -5 to 5 for scales)
+  const sliderSpec = [
+    { id: 'tuningHexCols', key: 'hexCols', format: (v) => String(Math.round(Number(v))), onChange: layoutOnChange },
+    { id: 'tuningHexRows', key: 'hexRows', format: (v) => String(Math.round(Number(v))), onChange: layoutOnChange },
+    { id: 'tuningOgDistance', key: 'ogDistance', format: (v) => Number(v).toFixed(2), onChange: layoutOnChange },
+    { id: 'tuningBallSize', key: 'ballSize', format: (v) => Number(v).toFixed(2), onChange: layoutOnChange },
+    { id: 'tuningSpeed', key: 'snapback', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningHoverScale', key: 'hoverScale', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningSpring', key: 'spring', format: (v) => String(Math.round(Number(v))) },
+    { id: 'tuningDamping', key: 'damping', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningGridShrink', key: 'gridShrink', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningRing1', key: 'ring1', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningRing2', key: 'ring2', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningScaleUp', key: 'scaleUp', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningScaleReturn', key: 'scaleReturn', format: (v) => Number(v).toFixed(3) },
+    { id: 'tuningRepel', key: 'repel', format: (v) => Number(v).toFixed(2) },
+    { id: 'tuningOverlapIter', key: 'overlapIter', format: (v) => String(Math.round(Number(v))) },
+    { id: 'tuningPullLerp', key: 'pullLerp', format: (v) => Number(v).toFixed(3) },
+  ];
+  sliderSpec.forEach(({ id, key, format, onChange }) => {
+    const input = document.getElementById(id);
+    const valueEl = document.getElementById(id + 'Value');
+    if (!input) return;
+    function sync() {
+      let v = Number(input.value);
+      if (key === 'overlapIter') v = Math.max(1, Math.round(v));
+      else if (key === 'hexCols' || key === 'hexRows') v = Math.max(1, Math.min(20, Math.round(v)));
+      tuning[key] = v;
+      if (valueEl) valueEl.textContent = format(input.value);
+      if (onChange) onChange();
+    }
+    input.addEventListener('input', sync);
+    sync();
+  });
+
   physicsLoop();
 }
 
-// Braun 音響網孔：規則圓點網格（5×6），等距排列
-const BRAUN_COLS = 5;
-const BRAUN_ROWS = 5;
+// Hexagonal (honeycomb) grid: cols×rows from tuning; og distance = step multiplier
+const HEX_VERT_RATIO = Math.sqrt(3) / 2;
 
 function getCircleLayout(areaWidth, areaHeight) {
+  const cols = Math.max(1, Math.min(20, Math.round(tuning.hexCols)));
+  const rows = Math.max(1, Math.min(20, Math.round(tuning.hexRows)));
   const w = areaWidth - PADDING * 2 - EDGE_BUFFER * 2;
   const h = areaHeight - PADDING * 2 - EDGE_BUFFER * 2;
-  if (w <= 0 || h <= 0) return { step: 48, currentRadius: 24, viewCenterX: areaWidth / 2, viewCenterY: areaHeight / 2 };
-  const stepFromW = w / (BRAUN_COLS - 1 + 1);
-  const stepFromH = h / (BRAUN_ROWS - 1 + 1);
-  const step = Math.max(36, Math.min(140, Math.min(stepFromW, stepFromH) * 1.4));
-  const currentRadius = step * 0.52;  // og ball size (smaller)
+  if (w <= 0 || h <= 0) {
+    const c = Math.max(1, Math.round(tuning.hexCols));
+    const r = Math.max(1, Math.round(tuning.hexRows));
+    return { step: 48, currentRadius: 24, viewCenterX: areaWidth / 2, viewCenterY: areaHeight / 2, cols: c, rows: r };
+  }
+  const stepFromW = w / (cols - 0.5);
+  const stepFromH = h / ((rows - 1) * HEX_VERT_RATIO + 1.2);
+  let step = Math.max(20, Math.min(200, Math.min(stepFromW, stepFromH) * 1.25));
+  step *= Math.max(0.2, Math.min(3, tuning.ogDistance));
+  const currentRadius = step * 0.52;
   const viewCenterX = (areaWidth - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
   const viewCenterY = (areaHeight - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
-  return { step, currentRadius, viewCenterX, viewCenterY };
+  return { step, currentRadius, viewCenterX, viewCenterY, cols, rows };
 }
 
-function circlePosition30(i, step, viewCenterX, viewCenterY) {
-  const col = i % BRAUN_COLS;
-  const row = Math.floor(i / BRAUN_COLS);
-  const gridCenterCol = (BRAUN_COLS - 1) / 2;
-  const gridCenterRow = (BRAUN_ROWS - 1) / 2;
-  const x = viewCenterX + (col - gridCenterCol) * step;
-  const y = viewCenterY + (row - gridCenterRow) * step;
+function circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows) {
+  const col = i % cols;
+  const row = Math.floor(i / cols);
+  const gridCenterCol = (cols - 1) / 2;
+  const gridCenterRow = (rows - 1) / 2;
+  const x = viewCenterX + (col - gridCenterCol) * step + (row % 2) * (step / 2);
+  const y = viewCenterY + (row - gridCenterRow) * step * HEX_VERT_RATIO;
   return { x, y };
 }
 
@@ -165,14 +244,15 @@ function buildHexBubbles() {
   const w = rect.width || window.innerWidth;
   const h = getLayoutHeight();
   const layout = getCircleLayout(w, h);
-  currentRadius = layout.currentRadius;
-  const { step, viewCenterX, viewCenterY } = layout;
+  currentRadius = layout.currentRadius * tuning.ballSize;
+  const { step, viewCenterX, viewCenterY, cols, rows } = layout;
+  const totalBubbles = getTotalBubbles();
 
   const current = bubbles.length;
 
-  if (current >= TOTAL_BUBBLES) {
-    if (current > TOTAL_BUBBLES) {
-      const toRemove = bubbles.splice(TOTAL_BUBBLES);
+  if (current >= totalBubbles) {
+    if (current > totalBubbles) {
+      const toRemove = bubbles.splice(totalBubbles);
       toRemove.forEach((b) => b.el.remove());
       if (hoveredBubble && !bubbleAreaEl.contains(hoveredBubble.el)) hoveredBubble = null;
     }
@@ -180,8 +260,8 @@ function buildHexBubbles() {
     return;
   }
 
-  for (let i = current; i < TOTAL_BUBBLES; i++) {
-    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY);
+  for (let i = current; i < totalBubbles; i++) {
+    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows);
     const project = PROJECTS[i % PROJECTS.length];
     const data = {
       project,
@@ -203,16 +283,24 @@ function buildHexBubbles() {
 
 function updateRestPositions(areaWidth, areaHeight) {
   const layout = getCircleLayout(areaWidth, areaHeight);
-  currentRadius = layout.currentRadius;
-  const { step, viewCenterX, viewCenterY } = layout;
+  currentRadius = layout.currentRadius * tuning.ballSize;
+  const { step, viewCenterX, viewCenterY, cols, rows } = layout;
+  const totalBubbles = getTotalBubbles();
   bubbles.forEach((b, i) => {
-    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY);
+    if (i >= totalBubbles) return;
+    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows);
     b.restX = x;
     b.restY = y;
   });
+  const size = currentRadius * 2;
   bubbles.forEach((b) => {
-    b.el.style.width = `${currentRadius * 2}px`;
-    b.el.style.height = `${currentRadius * 2}px`;
+    b.el.style.width = `${size}px`;
+    b.el.style.height = `${size}px`;
+    const inner = b.el.querySelector('.vita-bubble');
+    if (inner) {
+      inner.style.width = `${size}px`;
+      inner.style.height = `${size}px`;
+    }
   });
 }
 
@@ -281,7 +369,8 @@ function dist(ax, ay, bx, by) {
   return Math.hypot(bx - ax, by - ay);
 }
 
-// 依「接觸」做 BFS：第 0 圈 = hovered，第 1～3 圈 = 沿接觸往外擴散
+// 依「接觸」做 BFS：第 0 圈 = hovered，往外多圈，遠的球縮更小留空間
+const MAX_RING = 6;
 function getRingIndices() {
   const n = bubbles.length;
   const ring = new Int32Array(n).fill(-1);
@@ -294,13 +383,13 @@ function getRingIndices() {
   while (head < queue.length) {
     const i = queue[head++];
     const ri = ring[i];
-    if (ri >= 3) continue;
+    if (ri >= MAX_RING) continue;
     const ax = bubbles[i].restX;
     const ay = bubbles[i].restY;
     for (let j = 0; j < n; j++) {
       if (ring[j] >= 0) continue;
       const d = dist(ax, ay, bubbles[j].restX, bubbles[j].restY);
-      if (d <= currentRadius * 2 * TOUCH_DIST_FACTOR) {
+      if (d <= currentRadius * 2 * RING_NEIGHBOR_DIST_FACTOR) {
         ring[j] = ri + 1;
         queue.push(j);
       }
@@ -311,43 +400,49 @@ function getRingIndices() {
 
 function physicsLoop() {
   const n = bubbles.length;
-  const ring = getRingIndices();
 
-  // Aligned vertical line: no scaling. Grid: hover scale by ring
+  // Aligned vertical line: no scaling. Grid: scale by distance to cursor when cursor is near (pointer in area)
   bubbleAreaEl.classList.toggle('vita-aligned-line', scrollMode === 2);
+  const falloffDist = currentRadius * 2 * 2.5;  // distance over which scale goes from hoverScale to gridShrink
   bubbles.forEach((b, i) => {
     if (scrollMode === 2) {
       b.targetScale = 1;
+    } else if (!pointerActive) {
+      b.targetScale = 1;  // cursor left area: all normal size
     } else {
-      const r = ring[i];
-      if (r === 0) b.targetScale = HOVER_SCALE;
-      else if (r >= 1 && r <= 3) b.targetScale = 1 + (HOVER_SCALE - 1) * RING_SCALE[r];
-      else b.targetScale = GRID_SHRINK_SCALE;  // 非鄰居縮小，避免與放大球碰撞
+      // Cursor in area: size changes by distance to cursor (no need to hover a ball)
+      const d = dist(b.restX, b.restY, pointerX, pointerY);
+      const t = Math.min(1, d / falloffDist);  // 0 at cursor, 1 at falloff and beyond
+      const floor = Math.max(-5, Math.min(5, tuning.gridShrink));
+      b.targetScale = tuning.hoverScale + (floor - tuning.hoverScale) * t;
+      b.targetScale = Math.max(-5, Math.min(5, b.targetScale));
     }
   });
 
   // Forces: spring to rest + repulsion
   const fx = new Float64Array(n);
   const fy = new Float64Array(n);
-  const kRest = scrollMode === 2 ? K_REST * 0.42 : K_REST;  // slower transition to vertical line
+  const kRest = (scrollMode === 2 ? tuning.spring * 0.42 : tuning.spring) * tuning.snapback;
 
   for (let i = 0; i < n; i++) {
     const a = bubbles[i];
-    const rA = currentRadius * a.scale;
-
-    fx[i] = kRest * (a.restX - a.x);
-    fy[i] = kRest * (a.restY - a.y);
+    const rA = currentRadius * Math.abs(a.scale);
+    // Hovered ball snaps to cursor; others snap to rest
+    const targetX = a === hoveredBubble ? pointerX : a.restX;
+    const targetY = a === hoveredBubble ? pointerY : a.restY;
+    fx[i] = kRest * (targetX - a.x);
+    fy[i] = kRest * (targetY - a.y);
 
     for (let j = i + 1; j < n; j++) {
       const b = bubbles[j];
-      const rB = currentRadius * b.scale;
+      const rB = currentRadius * Math.abs(b.scale);
       const d = dist(a.x, a.y, b.x, b.y);
       const minD = rA + rB;
       if (d < minD && d > 1e-6) {
         const overlap = minD - d;
         const nx = (a.x - b.x) / d;
         const ny = (a.y - b.y) / d;
-        const f = K_REPEL * overlap;
+        const f = tuning.repel * overlap;
         fx[i] += nx * f;
         fy[i] += ny * f;
         fx[j] -= nx * f;
@@ -362,30 +457,26 @@ function physicsLoop() {
     b.vy += (fy[i] / MASS) * DT;
     b.x += b.vx * DT;
     b.y += b.vy * DT;
-    b.vx *= DAMPING;
-    b.vy *= DAMPING;
+    b.vx *= tuning.damping;
+    b.vy *= tuning.damping;
   });
 
-  // Grid mode: 所有球固定在 rest 位置，不因縮放而位移
-  if (scrollMode === 0) {
-    bubbles.forEach((b) => {
-      b.x = b.restX;
-      b.y = b.restY;
-      b.vx = 0;
-      b.vy = 0;
-    });
-  }
+  // Grid mode: no hard pin so balls can ease back naturally; hovered stays at rest later
+  // (removed: pin all to rest here — let spring + pullLerp do a slower, natural snap)
 
-  // 結束 hover 後：強彈簧 + 輕微直接拉回，快速回原位；接近時鎖回 5×5 / 垂直線
-  if (!hoveredBubble) {
-    const SNAP_RADIUS = 3;
-    const SNAP_SPEED = 3;
-    const pullLerp = scrollMode === 2 ? 0.07 : 0.18;  // slower pull when moving to vertical line
-    bubbles.forEach((b) => {
-      b.x += (b.restX - b.x) * pullLerp;
-      b.y += (b.restY - b.y) * pullLerp;
-      b.vx *= 0.92;
-      b.vy *= 0.92;
+  // Pull: hovered ball toward cursor, others toward rest
+  const SNAP_RADIUS = 2;
+  const SNAP_SPEED = 0.8;
+  const basePullLerp = scrollMode === 2 ? 0.05 : tuning.pullLerp;
+  const pullLerp = basePullLerp * tuning.snapback;
+  bubbles.forEach((b) => {
+    const targetX = b === hoveredBubble ? pointerX : b.restX;
+    const targetY = b === hoveredBubble ? pointerY : b.restY;
+    b.x += (targetX - b.x) * pullLerp;
+    b.y += (targetY - b.y) * pullLerp;
+    b.vx *= 0.94;
+    b.vy *= 0.94;
+    if (b !== hoveredBubble) {
       const dx = b.restX - b.x;
       const dy = b.restY - b.y;
       const distToRest = Math.hypot(dx, dy);
@@ -396,8 +487,8 @@ function physicsLoop() {
         b.vx = 0;
         b.vy = 0;
       }
-    });
-  }
+    }
+  });
 
   // Scale: in vertical array, larger at vertical center of screen; otherwise hover ring
   bubbles.forEach((b, i) => {
@@ -424,33 +515,46 @@ function physicsLoop() {
         label.style.opacity = nearlyClear || isHovered ? '1' : String(opacity);
       }
     } else {
-      const scaleUpLerp = ring[i] === 0 ? SCALE_LERP_CENTER : SCALE_LERP_RING;
+      // Same lerp for all (center, rings, grid shrink) so they scale in sync
       const scalingDown = b.targetScale < b.scale;
-      const scaleLerp = scalingDown ? SCALE_LERP_RETURN : scaleUpLerp;
+      const pointerSpeed = Math.hypot(pointerX - prevPointerX, pointerY - prevPointerY);
+      const cursorMoving = pointerSpeed > POINTER_MOVE_THRESHOLD;
+      const returnLerp = cursorMoving ? SCALE_LERP_RETURN_MOVING : tuning.scaleReturn;
+      const scaleLerp = scalingDown ? returnLerp : tuning.scaleUp;
       b.scale += (b.targetScale - b.scale) * scaleLerp;
-      b.scale = Math.max(0.4, Math.min(HOVER_SCALE + 0.15, b.scale));
+      b.scale = Math.max(-5, Math.min(5, b.scale));
     }
   });
 
-  // Position correction: resolve all ball-ball overlaps (no overlapping)
+  // Position correction: resolve overlaps; hovered ball stays fixed at center, others get pushed
   function resolveOverlaps() {
-    for (let iter = 0; iter < OVERLAP_ITERATIONS; iter++) {
+    for (let iter = 0; iter < tuning.overlapIter; iter++) {
       for (let i = 0; i < n; i++) {
         const a = bubbles[i];
-        const rA = currentRadius * a.scale;
+        const rA = currentRadius * Math.abs(a.scale);
+        const aFixed = a === hoveredBubble;
         for (let j = i + 1; j < n; j++) {
           const b = bubbles[j];
-          const rB = currentRadius * b.scale;
+          const rB = currentRadius * Math.abs(b.scale);
           const d = dist(a.x, a.y, b.x, b.y);
           const minD = rA + rB;
           if (d < minD && d > 1e-6) {
             const overlap = minD - d;
             const nx = (a.x - b.x) / d;
             const ny = (a.y - b.y) / d;
-            a.x += nx * (overlap * 0.5);
-            a.y += ny * (overlap * 0.5);
-            b.x -= nx * (overlap * 0.5);
-            b.y -= ny * (overlap * 0.5);
+            const bFixed = b === hoveredBubble;
+            if (aFixed) {
+              b.x -= nx * overlap;
+              b.y -= ny * overlap;
+            } else if (bFixed) {
+              a.x += nx * overlap;
+              a.y += ny * overlap;
+            } else {
+              a.x += nx * (overlap * 0.5);
+              a.y += ny * (overlap * 0.5);
+              b.x -= nx * (overlap * 0.5);
+              b.y -= ny * (overlap * 0.5);
+            }
           }
         }
       }
@@ -470,7 +574,7 @@ function physicsLoop() {
     : areaH - PADDING - EDGE_BUFFER;
   const edgeB = scrollMode === 2 ? lineBottom : areaH - PADDING - EDGE_BUFFER;
   bubbles.forEach((b) => {
-    const r = currentRadius * b.scale;
+    const r = currentRadius * Math.abs(b.scale);
     b.x = Math.max(edgeL + r, Math.min(edgeR - r, b.x));
     b.y = Math.max(edgeT + r, Math.min(edgeB - r, b.y));
   });
@@ -478,10 +582,16 @@ function physicsLoop() {
   // Resolve again after boundary clamp so no overlap remains
   resolveOverlaps();
 
+  // Hovered ball follows cursor (no pin to rest); scaling from center via CSS transform-origin
+
   bubbles.forEach((b) => {
     b.el.style.transform = `translate(${b.x - currentRadius}px, ${b.y - currentRadius}px) scale(${b.scale})`;
+    const hit = b.el.querySelector('.vita-bubble-hit');
+    if (hit) hit.style.transform = `scale(${1 / b.scale})`;  // hit area stays same visual size
   });
 
+  prevPointerX = pointerX;
+  prevPointerY = pointerY;
   requestAnimationFrame(physicsLoop);
 }
 
@@ -490,10 +600,11 @@ function onResize() {
   const w = rect.width || window.innerWidth;
   const h = getLayoutHeight();
 
-  if (bubbles.length < TOTAL_BUBBLES) {
+  const totalBubbles = getTotalBubbles();
+  if (bubbles.length < totalBubbles) {
     buildHexBubbles();
-  } else if (bubbles.length > TOTAL_BUBBLES) {
-    const toRemove = bubbles.splice(TOTAL_BUBBLES);
+  } else if (bubbles.length > totalBubbles) {
+    const toRemove = bubbles.splice(totalBubbles);
     toRemove.forEach((b) => b.el.remove());
     if (hoveredBubble && !bubbleAreaEl.contains(hoveredBubble.el)) hoveredBubble = null;
   }

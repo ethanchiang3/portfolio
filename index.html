@@ -18,6 +18,144 @@
       <!-- Bubbles injected by JS -->
     </main>
 
+    <!-- Tuning: rows, cols, og distance + all params (scales -5 to 5, larger ranges) -->
+    <aside class="tuning-panel" id="tuningPanel" aria-label="Tune bubbles">
+      <div class="tuning-panel-header">
+        <span class="tuning-panel-title">Controls</span>
+        <button type="button" class="tuning-panel-hide" id="tuningPanelHide" aria-label="Hide control panel">Hide</button>
+      </div>
+      <div class="tuning-panel-inner">
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningHexCols" class="tuning-title">Columns</label>
+            <span class="tuning-desc">Number of columns in hex grid</span>
+          </div>
+          <input type="range" id="tuningHexCols" min="1" max="20" step="1" value="5">
+          <span class="tuning-value" id="tuningHexColsValue">5</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningHexRows" class="tuning-title">Rows</label>
+            <span class="tuning-desc">Number of rows in hex grid</span>
+          </div>
+          <input type="range" id="tuningHexRows" min="1" max="20" step="1" value="5">
+          <span class="tuning-value" id="tuningHexRowsValue">5</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningOgDistance" class="tuning-title">OG distance</label>
+            <span class="tuning-desc">Base spacing multiplier between bubbles</span>
+          </div>
+          <input type="range" id="tuningOgDistance" min="0.2" max="3" step="0.05" value="0.65">
+          <span class="tuning-value" id="tuningOgDistanceValue">0.65</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningBallSize" class="tuning-title">Ball size</label>
+            <span class="tuning-desc">Global radius multiplier for all bubbles</span>
+          </div>
+          <input type="range" id="tuningBallSize" min="0.1" max="10" step="0.05" value="1">
+          <span class="tuning-value" id="tuningBallSizeValue">1.00</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningSpeed" class="tuning-title">Snap to cursor</label>
+            <span class="tuning-desc">How fast hovered ball follows cursor; others return to rest</span>
+          </div>
+          <input type="range" id="tuningSpeed" min="0.01" max="10" step="0.05" value="1.01">
+          <span class="tuning-value" id="tuningSpeedValue">1.01</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningHoverScale" class="tuning-title">Hover scale</label>
+            <span class="tuning-desc">Scale of the hovered (center) bubble (-5 to 5)</span>
+          </div>
+          <input type="range" id="tuningHoverScale" min="-5" max="5" step="0.05" value="1.35">
+          <span class="tuning-value" id="tuningHoverScaleValue">1.35</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningSpring" class="tuning-title">Spring strength</label>
+            <span class="tuning-desc">Restoring force toward grid / cursor</span>
+          </div>
+          <input type="range" id="tuningSpring" min="1" max="300" step="1" value="22">
+          <span class="tuning-value" id="tuningSpringValue">22</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningDamping" class="tuning-title">Damping</label>
+            <span class="tuning-desc">Velocity decay; lower = more bounce</span>
+          </div>
+          <input type="range" id="tuningDamping" min="0.5" max="1" step="0.01" value="0.91">
+          <span class="tuning-value" id="tuningDampingValue">0.91</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningGridShrink" class="tuning-title">Grid shrink</label>
+            <span class="tuning-desc">Scale of non-neighbors when hovered only (-5 to 5)</span>
+          </div>
+          <input type="range" id="tuningGridShrink" min="-5" max="5" step="0.05" value="0.5">
+          <span class="tuning-value" id="tuningGridShrinkValue">0.50</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningRing1" class="tuning-title">Ring 1 scale</label>
+            <span class="tuning-desc">First neighbor ring (-5 to 5)</span>
+          </div>
+          <input type="range" id="tuningRing1" min="-5" max="5" step="0.05" value="0.1">
+          <span class="tuning-value" id="tuningRing1Value">0.10</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningRing2" class="tuning-title">Ring 2 scale</label>
+            <span class="tuning-desc">Second neighbor ring (-5 to 5)</span>
+          </div>
+          <input type="range" id="tuningRing2" min="-5" max="5" step="0.05" value="0.05">
+          <span class="tuning-value" id="tuningRing2Value">0.05</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningScaleUp" class="tuning-title">Scale up speed</label>
+            <span class="tuning-desc">How fast hovered/neighbors scale up</span>
+          </div>
+          <input type="range" id="tuningScaleUp" min="0.01" max="2" step="0.01" value="0.22">
+          <span class="tuning-value" id="tuningScaleUpValue">0.22</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningScaleReturn" class="tuning-title">Scale return</label>
+            <span class="tuning-desc">How fast scale returns when unhovering</span>
+          </div>
+          <input type="range" id="tuningScaleReturn" min="0.001" max="0.5" step="0.005" value="0.041">
+          <span class="tuning-value" id="tuningScaleReturnValue">0.041</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningRepel" class="tuning-title">Repulsion</label>
+            <span class="tuning-desc">Overlap-push strength between balls</span>
+          </div>
+          <input type="range" id="tuningRepel" min="0.1" max="10" step="0.1" value="1.1">
+          <span class="tuning-value" id="tuningRepelValue">1.10</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningOverlapIter" class="tuning-title">Overlap iterations</label>
+            <span class="tuning-desc">Passes to resolve overlaps (smoother)</span>
+          </div>
+          <input type="range" id="tuningOverlapIter" min="1" max="50" step="1" value="10">
+          <span class="tuning-value" id="tuningOverlapIterValue">10</span>
+        </div>
+        <div class="tuning-row">
+          <div class="tuning-label-cell">
+            <label for="tuningPullLerp" class="tuning-title">Pull lerp</label>
+            <span class="tuning-desc">Direct pull toward rest / cursor per frame</span>
+          </div>
+          <input type="range" id="tuningPullLerp" min="0.001" max="1" step="0.01" value="0.061">
+          <span class="tuning-value" id="tuningPullLerpValue">0.061</span>
+        </div>
+      </div>
+    </aside>
+    <button type="button" class="tuning-panel-show-tab" id="tuningPanelShow" aria-label="Show control panel" hidden>Controls</button>
   </div>
 
   <script src="game.js"></script>
