@@ -17,12 +17,18 @@
   padding: 0;
 }
 
+html {
+  overscroll-behavior-y: none;
+}
+
 body {
   min-height: 100vh;
+  padding-bottom: 300px;
   background: var(--vita-bg);
   font-family: 'Noto Sans TC', sans-serif;
   color: var(--vita-text);
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 /* ----- Live Area container ----- */
@@ -430,8 +436,10 @@ body {
   color: #fff;
 }
 
-/* ----- Site footer ----- */
+/* ----- Site footer: on top in z-order so copyright is never covered by carousel ----- */
 .site-footer {
+  position: relative;
+  z-index: 20;
   padding: 1.5rem 1.5rem 2rem;
   text-align: center;
   font-size: 0.75rem;
@@ -439,6 +447,7 @@ body {
   line-height: 1.5;
   max-width: 60ch;
   margin: 0 auto;
+  background: var(--vita-bg);
 }
 
 @media (max-width: 600px) {

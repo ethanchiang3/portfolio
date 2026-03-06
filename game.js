@@ -82,6 +82,27 @@ function tickerImageUrl(folderName, filename, refreshTs) {
 function tickerImagesOnly(images) {
   return images.filter((f) => TICKER_IMAGE_EXT.test(f));
 }
+
+let lastPreloadedFolderIndex = -1;
+function preloadTickerFolderImages(folderIndex) {
+  if (folderIndex < 0 || folderIndex >= TICKER_FOLDERS.length) return;
+  const folder = TICKER_FOLDERS[folderIndex];
+  if (!folder || !folder.images.length) return;
+  const images = tickerImagesOnly(folder.images);
+  images.forEach((filename) => {
+    const url = tickerImageUrl(folder.name, filename);
+    const img = new Image();
+    img.src = url;
+  });
+}
+
+function preloadAdjacentTickerFolders(folderIndex) {
+  [folderIndex - 1, folderIndex + 1].forEach((idx) => {
+    if (idx >= 0 && idx < TICKER_FOLDERS.length && idx !== lastPreloadedFolderIndex) {
+      preloadTickerFolderImages(idx);
+    }
+  });
+}
 // Base path for assets so they load on GitHub Pages (e.g. /portfolio/) and locally
 (function () {
   const p = window.location.pathname;
@@ -345,7 +366,6 @@ function setTickerContent(folderIndex) {
     arcTickerTrack.innerHTML = '';
     arcTickerTrack.classList.remove('is-dragging');
     carouselIsDragging = false;
-    const refreshTs = Date.now(); // cache-bust so images reload on each build
     const viewportWidth = carouselViewport.offsetWidth || 400;
     carouselCardWidthPx = Math.floor(viewportWidth); // integer px to avoid right-edge sub-pixel flicker
     carouselN = n;
@@ -362,7 +382,7 @@ function setTickerContent(folderIndex) {
     cloneLastCard.className = 'carousel-card';
     cloneLastCard.style.width = `${carouselCardWidthPx}px`;
     const imgLast = document.createElement('img');
-    imgLast.src = tickerImageUrl(folder.name, lastFilename, refreshTs);
+    imgLast.src = tickerImageUrl(folder.name, lastFilename);
     imgLast.alt = '';
     imgLast.decoding = 'async';
     cloneLastCard.appendChild(imgLast);
@@ -373,10 +393,10 @@ function setTickerContent(folderIndex) {
       card.className = 'carousel-card';
       card.style.width = `${carouselCardWidthPx}px`;
       const img = document.createElement('img');
-      img.src = tickerImageUrl(folder.name, filename, refreshTs);
+      img.src = tickerImageUrl(folder.name, filename);
       img.alt = '';
       img.decoding = 'async';
-      img.loading = i < 3 ? 'eager' : 'lazy';
+      img.loading = i < 8 ? 'eager' : 'lazy';
       card.appendChild(img);
       arcTickerTrack.appendChild(card);
     });
@@ -1046,9 +1066,18 @@ function physicsLoop() {
       const now = performance.now();
       const scrollIdleLongEnough = (now - lastUserScrollTime) >= TICKER_SCROLL_IDLE_MS;
       const snapIdleLongEnough = (now - lastUserScrollTime) >= ARC_SNAP_IDLE_MS;
-      if (snapIdleLongEnough && highlightedBubble && !didSnapToCenterThisIdle) {
+      const maxScrollForSnap = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const distFromBottom = maxScrollForSnap - window.scrollY;
+      const notAtBottom = distFromBottom >= 400;
+      if (snapIdleLongEnough && highlightedBubble && !didSnapToCenterThisIdle && notAtBottom) {
         snapArcBallToCenter(highlightedBubble);
         didSnapToCenterThisIdle = true;
+      }
+      const folderIndexForPreload = highlightedBubble ? bubbles.indexOf(highlightedBubble) : -1;
+      if (folderIndexForPreload >= 0 && folderIndexForPreload !== lastPreloadedFolderIndex) {
+        lastPreloadedFolderIndex = folderIndexForPreload;
+        preloadTickerFolderImages(folderIndexForPreload);
+        setTimeout(() => preloadAdjacentTickerFolders(folderIndexForPreload), 50);
       }
       if (ninetyPctSettled && highlightedBubble && scrollIdleLongEnough) {
         if (arcTickerSettledSince === 0) arcTickerSettledSince = now;
@@ -1076,7 +1105,7 @@ function physicsLoop() {
   if (arcTickerPanel) {
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const distFromBottom = maxScroll - window.scrollY;
-    if (distFromBottom < 320) {
+    if (distFromBottom < 400) {
       arcTickerPanel.classList.add('fade-near-footer');
     } else {
       arcTickerPanel.classList.remove('fade-near-footer');
