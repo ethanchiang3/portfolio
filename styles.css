@@ -27,7 +27,7 @@ body {
 
 /* ----- Live Area container ----- */
 .vita-livearea {
-  min-height: 120vh;
+  min-height: calc(180vh + 200px);
   display: flex;
   flex-direction: column;
   background: #ffffff;
@@ -52,6 +52,33 @@ body {
 .vita-livearea:has(.vita-bubble-area.vita-aligned-line)::after {
   bottom: 0;
   background: linear-gradient(to top, #fff 0%, rgba(255,255,255,0) 100%);
+}
+
+/* Scroll-down hint: middle bottom on first stage (grid), hidden in arc */
+.scroll-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 4;
+  color: var(--vita-text);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  animation: scroll-hint-bounce 2s ease-in-out infinite;
+}
+.scroll-hint svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+.vita-livearea:has(.vita-bubble-area.vita-aligned-line) .scroll-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes scroll-hint-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
 }
 
 /* ----- Name in top left corner ----- */
@@ -83,7 +110,7 @@ body {
 
 /* ----- Bubble area: full scroll height so balls stack at bottom of page after scrolling ----- */
 .vita-bubble-area {
-  min-height: 120vh;
+  min-height: calc(180vh + 200px);
   position: relative;
   overflow: hidden;
   contain: layout paint;
@@ -292,6 +319,10 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
+.arc-ticker-panel.fade-near-footer {
+  opacity: 0;
+  pointer-events: none;
+}
 .carousel-viewport {
   flex: 1;
   overflow: hidden;
@@ -397,6 +428,17 @@ body {
 }
 .carousel-nav.dark-bg svg {
   color: #fff;
+}
+
+/* ----- Site footer ----- */
+.site-footer {
+  padding: 1.5rem 1.5rem 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--vita-muted);
+  line-height: 1.5;
+  max-width: 60ch;
+  margin: 0 auto;
 }
 
 @media (max-width: 600px) {

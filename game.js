@@ -313,7 +313,7 @@ function sampleLuminance(img, leftFraction, rightFraction) {
         rightCount++;
       }
     }
-    return {
+  return {
       left: leftCount ? leftSum / leftCount : 255,
       right: rightCount ? rightSum / rightCount : 255
     };
@@ -1071,6 +1071,15 @@ function physicsLoop() {
       arcTickerSettledSince = 0;
       arcTickerPanel.classList.remove('is-visible');
       lastTickerFolderIndex = -1;
+    }
+  }
+  if (arcTickerPanel) {
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const distFromBottom = maxScroll - window.scrollY;
+    if (distFromBottom < 320) {
+      arcTickerPanel.classList.add('fade-near-footer');
+    } else {
+      arcTickerPanel.classList.remove('fade-near-footer');
     }
   }
 
