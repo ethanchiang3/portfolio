@@ -62,7 +62,7 @@ const BUBBLE_IMAGES = [
 const ASSET_BASE = window.__ASSET_BASE__ || '';
 const PADDING = 20;
 const EDGE_BUFFER = 28;
-const HOVER_SCALE = 2.5;
+const HOVER_SCALE = 1.5;
 let currentRadius = 44;     // 依視窗計算，使 30 球填滿
 
 // Physics
@@ -73,14 +73,15 @@ const K_REPEL = 1.12;      // strong repulsion so balls never overlap
 const DAMPING = 0.88;      // allow overshoot so fast pull-back causes visible shake
 const OVERLAP_ITERATIONS = 10;  // more passes so overlap is fully resolved
 const TOUCH_DIST_FACTOR = 1.08;   // 依接觸算鄰居（略大於直徑）
-const RING_SCALE = [1, 0.58, 0.32, 0.16];  // 第 0～3 圈的放大係數 (0=hovered 滿倍)
+const RING_SCALE = [1, 0.28, 0.1, 0.04];   // 鄰球放大較小，減少波及
+const GRID_SHRINK_SCALE = 0.62;            // grid 下非鄰居縮小，避免碰撞
 const SCALE_LERP_CENTER = 0.22;  // 第一顆先放大（較快）
 const SCALE_LERP_RING = 0.09;    // 周圍延後、往外擴散（較慢）
 // Scroll modes: 0 = grid, 2 = aligned (vertical line) — no stack-on-bottom state
 const SCROLL_THRESHOLD = 80;
 let scrollMode = 0;  // 0 grid, 2 aligned vertical line
 
-let modalEl, bubbleAreaEl;
+let bubbleAreaEl;
 let bubbles = [];
 let hoveredBubble = null;
 let pointerX = 0;
@@ -88,8 +89,6 @@ let pointerY = 0;
 let pointerActive = false;
 
 function init() {
-  modalEl = document.getElementById('projectModal');
-  const modalCloseEl = document.getElementById('modalClose');
   bubbleAreaEl = document.getElementById('bubbleArea');
 
   buildHexBubbles();
@@ -109,9 +108,6 @@ function init() {
     pointerX = e.clientX - rect.left;
     pointerY = e.clientY - rect.top;
   });
-
-  modalCloseEl.addEventListener('click', closeModal);
-  modalEl.addEventListener('click', (e) => { if (e.target === modalEl) closeModal(); });
 
   window.addEventListener('scroll', () => {
     if (window.scrollY <= SCROLL_THRESHOLD) {
@@ -258,6 +254,11 @@ function createBubbleEl(project, data, bubbleIndex) {
   img.style.backgroundImage = `url(${ASSET_BASE}${BUBBLE_IMAGES[bubbleIndex % BUBBLE_IMAGES.length]})`;
   el.appendChild(img);
 
+  const hitArea = document.createElement('span');
+  hitArea.className = 'vita-bubble-hit';
+  hitArea.setAttribute('aria-hidden', 'true');
+  el.appendChild(hitArea);
+
   const label = document.createElement('span');
   label.className = 'vita-bubble-label';
   label.textContent = project.titleEn || project.title;
@@ -265,12 +266,8 @@ function createBubbleEl(project, data, bubbleIndex) {
   wrap.appendChild(el);
   wrap.appendChild(label);
 
-  el.addEventListener('click', (e) => {
-    e.preventDefault();
-    openProject(project);
-  });
-  el.addEventListener('mouseenter', () => setHovered(data));
-  el.addEventListener('mouseleave', () => setHovered(null));
+  hitArea.addEventListener('mouseenter', () => setHovered(data));
+  hitArea.addEventListener('mouseleave', () => setHovered(null));
 
   return wrap;
 }
@@ -324,14 +321,14 @@ function physicsLoop() {
       const r = ring[i];
       if (r === 0) b.targetScale = HOVER_SCALE;
       else if (r >= 1 && r <= 3) b.targetScale = 1 + (HOVER_SCALE - 1) * RING_SCALE[r];
-      else b.targetScale = 1;
+      else b.targetScale = GRID_SHRINK_SCALE;  // 非鄰居縮小，避免與放大球碰撞
     }
   });
 
   // Forces: spring to rest + repulsion
   const fx = new Float64Array(n);
   const fy = new Float64Array(n);
-  const kRest = scrollMode === 2 ? K_REST * 1.8 : K_REST;
+  const kRest = scrollMode === 2 ? K_REST * 0.42 : K_REST;  // slower transition to vertical line
 
   for (let i = 0; i < n; i++) {
     const a = bubbles[i];
@@ -368,13 +365,24 @@ function physicsLoop() {
     b.vy *= DAMPING;
   });
 
+  // Grid mode: 所有球固定在 rest 位置，不因縮放而位移
+  if (scrollMode === 0) {
+    bubbles.forEach((b) => {
+      b.x = b.restX;
+      b.y = b.restY;
+      b.vx = 0;
+      b.vy = 0;
+    });
+  }
+
   // 結束 hover 後：強彈簧 + 輕微直接拉回，快速回原位；接近時鎖回 5×5 / 垂直線
   if (!hoveredBubble) {
     const SNAP_RADIUS = 3;
     const SNAP_SPEED = 3;
+    const pullLerp = scrollMode === 2 ? 0.07 : 0.18;  // slower pull when moving to vertical line
     bubbles.forEach((b) => {
-      b.x += (b.restX - b.x) * 0.18;
-      b.y += (b.restY - b.y) * 0.18;
+      b.x += (b.restX - b.x) * pullLerp;
+      b.y += (b.restY - b.y) * pullLerp;
       b.vx *= 0.92;
       b.vy *= 0.92;
       const dx = b.restX - b.x;
@@ -398,9 +406,22 @@ function physicsLoop() {
       const centerY = window.innerHeight / 2;
       const distFromCenter = Math.abs(screenY - centerY);
       const falloff = 320;
-      const centerScale = 2;
+      const centerScale = 1.45;
       const t = Math.max(0, 1 - distFromCenter / falloff);
       b.scale = 1 + (centerScale - 1) * t;
+      // Blur label gradually by distance from center; 90%+ clear → show 100% clear
+      const label = b.el.querySelector('.vita-bubble-label');
+      if (label) {
+        const isHovered = hoveredBubble === b;
+        const blurFalloff = 280;
+        const maxBlur = 6;
+        const blurT = Math.min(1, distFromCenter / blurFalloff);
+        const blurPx = isHovered ? 0 : blurT * maxBlur;
+        const opacity = isHovered ? 1 : 1 - 0.35 * blurT;
+        const nearlyClear = blurT <= 0.1 || opacity >= 0.9;
+        label.style.filter = nearlyClear || isHovered ? 'none' : (blurPx > 0.1 ? `blur(${blurPx}px)` : 'none');
+        label.style.opacity = nearlyClear || isHovered ? '1' : String(opacity);
+      }
     } else {
       const scaleLerp = ring[i] === 0 ? SCALE_LERP_CENTER : SCALE_LERP_RING;
       b.scale += (b.targetScale - b.scale) * scaleLerp;
@@ -474,22 +495,6 @@ function onResize() {
     if (hoveredBubble && !bubbleAreaEl.contains(hoveredBubble.el)) hoveredBubble = null;
   }
   updateRestPositions(w, h);
-}
-
-function openProject(project) {
-  document.getElementById('modalTitle').textContent = project.title;
-  document.getElementById('modalTags').textContent = project.tags;
-  document.getElementById('modalDescription').textContent = project.description;
-  const linkEl = document.getElementById('modalLink');
-  linkEl.href = project.link || '#';
-  linkEl.style.display = project.link ? 'inline' : 'none';
-  modalEl.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  modalEl.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
 }
 
 if (document.readyState === 'loading') {

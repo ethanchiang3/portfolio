@@ -120,9 +120,23 @@ body {
   top: 0;
   overflow: visible;
   pointer-events: none;
+  transform-origin: 50% 50%;  /* scale from center of ball */
 }
 .vita-bubble-wrap .vita-bubble {
+  pointer-events: none;
+}
+/* Smaller hover hit area so cursor between balls doesn’t panic */
+.vita-bubble-hit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52%;
+  height: 52%;
+  margin-left: -26%;
+  margin-top: -26%;
+  border-radius: 50%;
   pointer-events: auto;
+  cursor: pointer;
 }
 .vita-bubble-label {
   display: none;
