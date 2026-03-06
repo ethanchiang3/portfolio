@@ -42,10 +42,10 @@ const PROJECTS = [
   },
 ];
 
+const NUM_CIRCLES = 19;
+let layoutPoints = [];
 function getTotalBubbles() {
-  const cols = Math.max(1, Math.min(20, Math.round(tuning.hexCols)));
-  const rows = Math.max(1, Math.min(20, Math.round(tuning.hexRows)));
-  return cols * rows;
+  return layoutPoints.length;
 }
 
 const BUBBLE_IMAGES = [
@@ -79,24 +79,23 @@ const POINTER_MOVE_THRESHOLD = 1.5;   // px per frame = cursor moving
 const SCROLL_THRESHOLD = 80;
 let scrollMode = 0;  // 0 grid, 2 aligned vertical line
 
-// Tuning: all slider-driven (wider ranges)
+// Tuning: applied settings (control panel removed)
 const tuning = {
-  ballSize: 1,
+  ballSize: 1.4,
   snapback: 1.01,
   hoverScale: 1.35,
   spring: 22,
   damping: 0.91,
   gridShrink: 0.5,
-  ring1: 0.1,
-  ring2: 0.05,
   scaleUp: 0.22,
   scaleReturn: 0.041,
   repel: 1.1,
   overlapIter: 10,
   pullLerp: 0.061,
-  hexCols: 5,
-  hexRows: 5,
-  ogDistance: 0.65,
+  polarRings: 9,
+  polarDensity: 0.95,
+  minDotsPerRing: 6,
+  ogDistance: 3,
 };
 
 let bubbleAreaEl;
@@ -143,84 +142,25 @@ function init() {
     }
   }, { passive: true });
 
-  function layoutOnChange() {
-    const r = bubbleAreaEl.getBoundingClientRect();
-    buildHexBubbles();
-    updateRestPositions(r.width || window.innerWidth, getLayoutHeight());
-  }
-  // Control panel hide / show
-  const tuningPanel = document.getElementById('tuningPanel');
-  const tuningPanelHide = document.getElementById('tuningPanelHide');
-  const tuningPanelShow = document.getElementById('tuningPanelShow');
-  if (tuningPanel && tuningPanelHide && tuningPanelShow) {
-    tuningPanelHide.addEventListener('click', () => {
-      tuningPanel.classList.add('is-hidden');
-      tuningPanelShow.removeAttribute('hidden');
-    });
-    tuningPanelShow.addEventListener('click', () => {
-      tuningPanel.classList.remove('is-hidden');
-      tuningPanelShow.setAttribute('hidden', '');
-    });
-  }
-  // Tuning sliders: rows, cols, og distance + all params (wide ranges including -5 to 5 for scales)
-  const sliderSpec = [
-    { id: 'tuningHexCols', key: 'hexCols', format: (v) => String(Math.round(Number(v))), onChange: layoutOnChange },
-    { id: 'tuningHexRows', key: 'hexRows', format: (v) => String(Math.round(Number(v))), onChange: layoutOnChange },
-    { id: 'tuningOgDistance', key: 'ogDistance', format: (v) => Number(v).toFixed(2), onChange: layoutOnChange },
-    { id: 'tuningBallSize', key: 'ballSize', format: (v) => Number(v).toFixed(2), onChange: layoutOnChange },
-    { id: 'tuningSpeed', key: 'snapback', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningHoverScale', key: 'hoverScale', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningSpring', key: 'spring', format: (v) => String(Math.round(Number(v))) },
-    { id: 'tuningDamping', key: 'damping', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningGridShrink', key: 'gridShrink', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningRing1', key: 'ring1', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningRing2', key: 'ring2', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningScaleUp', key: 'scaleUp', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningScaleReturn', key: 'scaleReturn', format: (v) => Number(v).toFixed(3) },
-    { id: 'tuningRepel', key: 'repel', format: (v) => Number(v).toFixed(2) },
-    { id: 'tuningOverlapIter', key: 'overlapIter', format: (v) => String(Math.round(Number(v))) },
-    { id: 'tuningPullLerp', key: 'pullLerp', format: (v) => Number(v).toFixed(3) },
-  ];
-  sliderSpec.forEach(({ id, key, format, onChange }) => {
-    const input = document.getElementById(id);
-    const valueEl = document.getElementById(id + 'Value');
-    if (!input) return;
-    function sync() {
-      let v = Number(input.value);
-      if (key === 'overlapIter') v = Math.max(1, Math.round(v));
-      else if (key === 'hexCols' || key === 'hexRows') v = Math.max(1, Math.min(20, Math.round(v)));
-      tuning[key] = v;
-      if (valueEl) valueEl.textContent = format(input.value);
-      if (onChange) onChange();
-    }
-    input.addEventListener('input', sync);
-    sync();
-  });
-
   physicsLoop();
 }
 
-// Hexagonal (honeycomb) grid: cols×rows from tuning; og distance = step multiplier
-const HEX_VERT_RATIO = Math.sqrt(3) / 2;
-
+// Polar grid layout: step derived from num rings and available radius
 function getCircleLayout(areaWidth, areaHeight) {
-  const cols = Math.max(1, Math.min(20, Math.round(tuning.hexCols)));
-  const rows = Math.max(1, Math.min(20, Math.round(tuning.hexRows)));
   const w = areaWidth - PADDING * 2 - EDGE_BUFFER * 2;
   const h = areaHeight - PADDING * 2 - EDGE_BUFFER * 2;
+  const maxRadius = Math.min(w, h) / 2 - 20;
+  const numRings = Math.max(1, Math.min(25, Math.round(tuning.polarRings)));
   if (w <= 0 || h <= 0) {
-    const c = Math.max(1, Math.round(tuning.hexCols));
-    const r = Math.max(1, Math.round(tuning.hexRows));
-    return { step: 48, currentRadius: 24, viewCenterX: areaWidth / 2, viewCenterY: areaHeight / 2, cols: c, rows: r };
+    return { step: 48, currentRadius: 24, viewCenterX: areaWidth / 2, viewCenterY: areaHeight / 2 };
   }
-  const stepFromW = w / (cols - 0.5);
-  const stepFromH = h / ((rows - 1) * HEX_VERT_RATIO + 1.2);
-  let step = Math.max(20, Math.min(200, Math.min(stepFromW, stepFromH) * 1.25));
+  let step = maxRadius / Math.max(1, numRings);
   step *= Math.max(0.2, Math.min(3, tuning.ogDistance));
-  const currentRadius = step * 0.52;
+  step = Math.max(18, Math.min(120, step));
+  const currentRadius = step * 0.48;
   const viewCenterX = (areaWidth - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
   const viewCenterY = (areaHeight - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
-  return { step, currentRadius, viewCenterX, viewCenterY, cols, rows };
+  return { step, currentRadius, viewCenterX, viewCenterY };
 }
 
 function circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows) {
@@ -231,6 +171,43 @@ function circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows) {
   const x = viewCenterX + (col - gridCenterCol) * step + (row % 2) * (step / 2);
   const y = viewCenterY + (row - gridCenterRow) * step * HEX_VERT_RATIO;
   return { x, y };
+}
+
+// Polar grid: concentric circles, one central dot, dots per ring increase to keep density even (speaker grille style)
+// Don't cull dots when og distance increases: ensure at least NUM_CIRCLES points by not over-limiting numRings
+function computePolarGridPoints(step, viewCenterX, viewCenterY, areaWidth, areaHeight) {
+  const maxRadius = Math.min(areaWidth, areaHeight) / 2 - PADDING - EDGE_BUFFER - step * 2;
+  let numRings = Math.min(
+    Math.max(1, Math.floor(maxRadius / step)),
+    Math.max(1, Math.round(tuning.polarRings))
+  );
+  const minDots = Math.max(4, Math.min(24, Math.round(tuning.minDotsPerRing)));
+  const density = Math.max(0.3, Math.min(2.5, tuning.polarDensity));
+  // Ensure enough rings for NUM_CIRCLES (1 center + ring dots); avoid culling when og distance changes
+  const maxRingsByTuning = Math.max(1, Math.round(tuning.polarRings));
+  let n = 1;
+  let r = 1;
+  while (n < NUM_CIRCLES && r <= maxRingsByTuning) {
+    const circumference = 2 * Math.PI * r * step;
+    n += Math.max(minDots, Math.round((circumference / step) * density));
+    r++;
+  }
+  numRings = Math.max(numRings, Math.min(r - 1, maxRingsByTuning));
+  const pts = [];
+  pts.push({ x: viewCenterX, y: viewCenterY });
+  for (let ring = 1; ring <= numRings; ring++) {
+    const r = ring * step;
+    const circumference = 2 * Math.PI * r;
+    const numDots = Math.max(minDots, Math.round((circumference / step) * density));
+    for (let i = 0; i < numDots; i++) {
+      const angle = (2 * Math.PI * i) / numDots;
+      pts.push({
+        x: viewCenterX + r * Math.cos(angle),
+        y: viewCenterY + r * Math.sin(angle),
+      });
+    }
+  }
+  return pts;
 }
 
 // Grid sits in first viewport; floor for scatter is bottom of full scroll area
@@ -245,7 +222,10 @@ function buildHexBubbles() {
   const h = getLayoutHeight();
   const layout = getCircleLayout(w, h);
   currentRadius = layout.currentRadius * tuning.ballSize;
-  const { step, viewCenterX, viewCenterY, cols, rows } = layout;
+  const { step, viewCenterX, viewCenterY } = layout;
+  const w2 = rect.width || window.innerWidth;
+  const h2 = getLayoutHeight();
+  layoutPoints = computePolarGridPoints(step, viewCenterX, viewCenterY, w2, h2).slice(0, NUM_CIRCLES);
   const totalBubbles = getTotalBubbles();
 
   const current = bubbles.length;
@@ -261,7 +241,7 @@ function buildHexBubbles() {
   }
 
   for (let i = current; i < totalBubbles; i++) {
-    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows);
+    const { x, y } = layoutPoints[i];
     const project = PROJECTS[i % PROJECTS.length];
     const data = {
       project,
@@ -284,11 +264,12 @@ function buildHexBubbles() {
 function updateRestPositions(areaWidth, areaHeight) {
   const layout = getCircleLayout(areaWidth, areaHeight);
   currentRadius = layout.currentRadius * tuning.ballSize;
-  const { step, viewCenterX, viewCenterY, cols, rows } = layout;
+  const { step, viewCenterX, viewCenterY } = layout;
+  layoutPoints = computePolarGridPoints(step, viewCenterX, viewCenterY, areaWidth, areaHeight).slice(0, NUM_CIRCLES);
   const totalBubbles = getTotalBubbles();
   bubbles.forEach((b, i) => {
     if (i >= totalBubbles) return;
-    const { x, y } = circlePosition30(i, step, viewCenterX, viewCenterY, cols, rows);
+    const { x, y } = layoutPoints[i];
     b.restX = x;
     b.restY = y;
   });
@@ -603,6 +584,9 @@ function onResize() {
   const w = rect.width || window.innerWidth;
   const h = getLayoutHeight();
 
+  // Recompute polar grid so counts are correct on resize
+  const layout = getCircleLayout(w, h);
+  layoutPoints = computePolarGridPoints(layout.step, layout.viewCenterX, layout.viewCenterY, w, h).slice(0, NUM_CIRCLES);
   const totalBubbles = getTotalBubbles();
   if (bubbles.length < totalBubbles) {
     buildHexBubbles();
