@@ -77,6 +77,7 @@ const RING_SCALE = [1, 0.28, 0.1, 0.04];   // 鄰球放大較小，減少波及
 const GRID_SHRINK_SCALE = 0.62;            // grid 下非鄰居縮小，避免碰撞
 const SCALE_LERP_CENTER = 0.22;  // 第一顆先放大（較快）
 const SCALE_LERP_RING = 0.09;    // 周圍延後、往外擴散（較慢）
+const SCALE_LERP_RETURN = 0.04;  // 縮回原尺寸較慢
 // Scroll modes: 0 = grid, 2 = aligned (vertical line) — no stack-on-bottom state
 const SCROLL_THRESHOLD = 80;
 let scrollMode = 0;  // 0 grid, 2 aligned vertical line
@@ -137,7 +138,7 @@ function getCircleLayout(areaWidth, areaHeight) {
   const stepFromW = w / (BRAUN_COLS - 1 + 1);
   const stepFromH = h / (BRAUN_ROWS - 1 + 1);
   const step = Math.max(36, Math.min(140, Math.min(stepFromW, stepFromH) * 1.4));
-  const currentRadius = step * 0.48;
+  const currentRadius = step * 0.52;  // og ball size (smaller)
   const viewCenterX = (areaWidth - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
   const viewCenterY = (areaHeight - PADDING * 2 - EDGE_BUFFER * 2) / 2 + PADDING + EDGE_BUFFER;
   return { step, currentRadius, viewCenterX, viewCenterY };
@@ -423,7 +424,9 @@ function physicsLoop() {
         label.style.opacity = nearlyClear || isHovered ? '1' : String(opacity);
       }
     } else {
-      const scaleLerp = ring[i] === 0 ? SCALE_LERP_CENTER : SCALE_LERP_RING;
+      const scaleUpLerp = ring[i] === 0 ? SCALE_LERP_CENTER : SCALE_LERP_RING;
+      const scalingDown = b.targetScale < b.scale;
+      const scaleLerp = scalingDown ? SCALE_LERP_RETURN : scaleUpLerp;
       b.scale += (b.targetScale - b.scale) * scaleLerp;
       b.scale = Math.max(0.4, Math.min(HOVER_SCALE + 0.15, b.scale));
     }
