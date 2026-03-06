@@ -66,6 +66,7 @@ body {
   min-height: 120vh;
   position: relative;
   overflow: hidden;
+  contain: layout paint;
 }
 
 /* ----- Bubbles: absolute, position/scale set by JS; image + gloss overlay ----- */
@@ -119,6 +120,7 @@ body {
   top: 0;
   overflow: visible;
   pointer-events: none;
+  will-change: transform;
   transform-origin: 50% 50%;  /* scale from center of ball */
 }
 .vita-bubble-wrap .vita-bubble {

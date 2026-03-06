@@ -172,15 +172,17 @@ function setTickerContent(folderIndex) {
     }
 
     for (let r = 0; r < repeat; r++) {
+      const isFirstSet = r === 0;
       images.forEach((filename, i) => {
         const item = document.createElement('div');
         item.className = 'arc-ticker-item';
         const img = document.createElement('img');
         const url = tickerImageUrl(folder.name, filename);
-        img.src = url;
         img.alt = '';
-        img.loading = 'eager';
-        if (r === 0 && i < n) items.push(item);
+        img.decoding = 'async';
+        img.loading = isFirstSet ? 'eager' : 'lazy';
+        img.src = url;
+        if (isFirstSet && i < n) items.push(item);
         img.onload = measureAndStart;
         img.onerror = measureAndStart;
         item.appendChild(img);
@@ -215,6 +217,18 @@ function init() {
 
   buildHexBubbles();
   requestAnimationFrame(buildHexBubbles);
+
+  // Decode bubble images in idle time so main thread stays responsive
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+  idle(() => {
+    TICKER_FOLDERS.forEach((folder) => {
+      if (!folder || !folder.firstImage) return;
+      const img = new Image();
+      img.src = tickerImageUrl(folder.name, folder.firstImage);
+      if (img.decode) img.decode().catch(() => {});
+    });
+  });
+
   window.addEventListener('resize', onResize);
 
   // Right-half ticker panel: content set by highlighted bubble's folder in arc mode
@@ -536,6 +550,7 @@ function getRingIndices() {
 
 function physicsLoop() {
   const n = bubbles.length;
+  const areaRect = bubbleAreaEl.getBoundingClientRect();
 
   // Aligned vertical line: no scaling. Grid: scale by distance to cursor when cursor is near (pointer in area)
   bubbleAreaEl.classList.toggle('vita-aligned-line', scrollMode === 2);
@@ -630,8 +645,7 @@ function physicsLoop() {
   // Scale: in vertical array, larger at vertical center of screen; otherwise hover ring
   bubbles.forEach((b, i) => {
     if (scrollMode === 2) {
-      const r = bubbleAreaEl.getBoundingClientRect();
-      const screenY = r.top + b.y;
+      const screenY = areaRect.top + b.y;
       const centerY = window.innerHeight / 2;
       const distFromCenter = Math.abs(screenY - centerY);
       const falloff = 520;
@@ -691,12 +705,11 @@ function physicsLoop() {
       const threshold = Math.ceil(bubbles.length * ARC_TICKER_PCT_SETTLED);
       const ninetyPctSettled = settledCount >= threshold;
 
-      const r = bubbleAreaEl.getBoundingClientRect();
       const centerY = window.innerHeight / 2;
       let minD = Infinity;
       let highlightedBubble = null;
       bubbles.forEach((b) => {
-        const screenY = r.top + b.y;
+        const screenY = areaRect.top + b.y;
         const d = Math.abs(screenY - centerY);
         if (d < minD) {
           minD = d;
@@ -766,9 +779,8 @@ function physicsLoop() {
   resolveOverlaps();
 
   // Boundary: keep balls inside screen; aligned line can extend down
-  const rect = bubbleAreaEl.getBoundingClientRect();
-  const areaW = rect.width || 800;
-  const areaH = rect.height || 600;
+  const areaW = areaRect.width || 800;
+  const areaH = areaRect.height || 600;
   const edgeL = PADDING + EDGE_BUFFER;
   const edgeR = areaW - PADDING - EDGE_BUFFER;
   const edgeT = PADDING + EDGE_BUFFER;
