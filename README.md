@@ -42,6 +42,21 @@ python3 -m http.server 8000
 # 瀏覽 http://localhost:8000
 ```
 
+## 發布到 GitHub Pages
+
+1. **第一次推送到 GitHub**（在本機終端機執行，會要求登入）：
+   ```bash
+   cd /Users/jiangyichen/PORTFOLIO_CURSOR
+   git push -u origin main
+   ```
+   或執行：`./publish.sh`
+
+2. **在 GitHub 開啟 Pages**  
+   到 https://github.com/ethanchinag3/portfolio → **Settings** → **Pages** → **Source**: Deploy from a branch → **Branch**: `main`，**Folder**: `/ (root)` → **Save**。
+
+3. **網站網址**  
+   https://ethanchinag3.github.io/portfolio/
+
 ## 技術
 
 - 純 HTML / CSS / JavaScript，無框架
