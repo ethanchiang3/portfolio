@@ -52,10 +52,10 @@ python3 -m http.server 8000
    或執行：`./publish.sh`
 
 2. **在 GitHub 開啟 Pages**  
-   到 https://github.com/ethanchinag3/portfolio → **Settings** → **Pages** → **Source**: Deploy from a branch → **Branch**: `main`，**Folder**: `/ (root)` → **Save**。
+   到 https://github.com/ethanchiang3/portfolio → **Settings** → **Pages** → **Source**: Deploy from a branch → **Branch**: `main`，**Folder**: `/ (root)` → **Save**。
 
 3. **網站網址**  
-   https://ethanchinag3.github.io/portfolio/
+   https://ethanchiang3.github.io/portfolio/
 
 ## 技術
 

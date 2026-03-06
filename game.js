@@ -52,7 +52,6 @@ const BUBBLE_IMAGES = [
   'assets/4x_change_teh_pcb_color_from_green_to_black_________change_the_lens_from_50mm_to_200mm-fd068790-d942-4cb7-a874-b1863f93bb00.png',
   'assets/2x_use_2_as_art_direction__add_motion_blur_but_focus_on_the_Cufflinks-c4814752-a241-4b99-bcbd-dd05872862f3.png',
   'assets/4x_use_the_second_image_as_reference__apply_the_art_direction-6d815c8d-2bb4-4c7c-9966-d74b5c1476c9.png',
-  'assets/4x_use__2and_3__as_art_direction_of_the_render__zeep_the_zoom-in_position_don_t_change_the_design_and_size_and_aspect_of_the_first_image_1-c68c6fb9-8eec-49c7-9d20-287f317c2ec9.png',
 ];
 // Base path for assets so they load on GitHub Pages (e.g. /portfolio/) and locally
 (function () {
