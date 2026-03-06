@@ -54,6 +54,13 @@ const BUBBLE_IMAGES = [
   'assets/4x_use_the_second_image_as_reference__apply_the_art_direction-6d815c8d-2bb4-4c7c-9966-d74b5c1476c9.png',
   'assets/4x_use__2and_3__as_art_direction_of_the_render__zeep_the_zoom-in_position_don_t_change_the_design_and_size_and_aspect_of_the_first_image_1-c68c6fb9-8eec-49c7-9d20-287f317c2ec9.png',
 ];
+// Base path for assets so they load on GitHub Pages (e.g. /portfolio/) and locally
+(function () {
+  const p = window.location.pathname;
+  const base = p.match(/^\/[^/]+\/?$/) ? p.replace(/\/$/, '') + '/' : (p.endsWith('/') ? p : p.split('/').slice(0, -1).join('/') + '/');
+  window.__ASSET_BASE__ = base === '/' ? '' : base;
+})();
+const ASSET_BASE = window.__ASSET_BASE__ || '';
 const PADDING = 20;
 const EDGE_BUFFER = 28;
 const HOVER_SCALE = 2.5;
@@ -249,7 +256,7 @@ function createBubbleEl(project, data, bubbleIndex) {
 
   const img = document.createElement('span');
   img.className = 'vita-bubble-img';
-  img.style.backgroundImage = `url(${BUBBLE_IMAGES[bubbleIndex % BUBBLE_IMAGES.length]})`;
+  img.style.backgroundImage = `url(${ASSET_BASE}${BUBBLE_IMAGES[bubbleIndex % BUBBLE_IMAGES.length]})`;
   el.appendChild(img);
 
   const label = document.createElement('span');
