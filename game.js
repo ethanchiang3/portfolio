@@ -307,15 +307,17 @@ function updateRestPositions(areaWidth, areaHeight) {
 // Offset so the top circle is fully visible below the header/name
 const VERTICAL_LINE_TOP_OFFSET = 320;
 
-// Align all circles to a vertical line; first ball at viewport vertical center after scroll
+// Align all circles to a vertical line; first at viewport vertical center, last at vertical center when scrolled to end
+const VERTICAL_LINE_BOTTOM_PADDING = 0;  // 0 = last circle exactly at vertical center at max scroll
 function updateRestToVerticalLine() {
   const n = bubbles.length;
   if (n === 0) return;
-  const refX = bubbles[0].restX;  // left column x from grid
+  const refX = bubbles[0].restX;
   const spacing = 2 * currentRadius * 1.02;
-  // First ball center at viewport vertical center (in bubble-area coords: scrollY + center)
-  const firstBallY = window.scrollY + window.innerHeight / 2;
-  const lineHeightPx = firstBallY + (n - 1) * spacing + currentRadius + PADDING + EDGE_BUFFER;
+  const innerH = window.innerHeight;
+  const firstBallY = window.scrollY + innerH / 2;
+  // lineHeightPx so that at max scroll (lineHeightPx - innerH) the last circle is at viewport vertical center
+  const lineHeightPx = firstBallY + (n - 1) * spacing + innerH / 2 + VERTICAL_LINE_BOTTOM_PADDING;
   bubbleAreaEl.style.minHeight = `${lineHeightPx}px`;
   bubbles.forEach((b, i) => {
     b.restX = refX;
