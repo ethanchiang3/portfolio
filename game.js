@@ -403,16 +403,17 @@ function physicsLoop() {
 
   // Aligned vertical line: no scaling. Grid: scale by distance to cursor when cursor is near (pointer in area)
   bubbleAreaEl.classList.toggle('vita-aligned-line', scrollMode === 2);
-  const falloffDist = currentRadius * 2 * 2.5;  // distance over which scale goes from hoverScale to gridShrink
+  // Tighter falloff = less sensitive before hover (react only when cursor is closer)
+  const falloffDist = currentRadius * 2 * 1.35;
+  const falloffPower = 1.6;  // >1 = steeper curve, less reaction at medium distance
   bubbles.forEach((b, i) => {
     if (scrollMode === 2) {
       b.targetScale = 1;
     } else if (!pointerActive) {
       b.targetScale = 1;  // cursor left area: all normal size
     } else {
-      // Cursor in area: size changes by distance to cursor (no need to hover a ball)
       const d = dist(b.restX, b.restY, pointerX, pointerY);
-      const t = Math.min(1, d / falloffDist);  // 0 at cursor, 1 at falloff and beyond
+      const t = Math.min(1, Math.pow(d / falloffDist, falloffPower));
       const floor = Math.max(-5, Math.min(5, tuning.gridShrink));
       b.targetScale = tuning.hoverScale + (floor - tuning.hoverScale) * t;
       b.targetScale = Math.max(-5, Math.min(5, b.targetScale));
