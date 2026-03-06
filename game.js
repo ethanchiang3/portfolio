@@ -48,15 +48,39 @@ function getTotalBubbles() {
   return layoutPoints.length;
 }
 
-const BUBBLE_IMAGES = [
-  'assets/3A927DB1-F317-47BF-BA00-4A6DF368173B-8a6cc66b-7b25-40d2-a3aa-a3cee59fbba0.png',
-  'assets/IMG_1971-fccc0c5e-fd8e-4347-9e93-2e330e4e0d94.png',
-  'assets/Gemini_Generated_Image_nv1qcinv1qcinv1q-52ec0671-bbac-444c-a93c-92a9e2c81510.png',
-  'assets/2x_use__2_as_art_direction__adjust_the_image_style_of_the_render__remove_the_leaves-baeb956e-a864-4b34-9b66-195a9f4a26f2.png',
-  'assets/4x_change_teh_pcb_color_from_green_to_black_________change_the_lens_from_50mm_to_200mm-fd068790-d942-4cb7-a874-b1863f93bb00.png',
-  'assets/2x_use_2_as_art_direction__add_motion_blur_but_focus_on_the_Cufflinks-c4814752-a241-4b99-bcbd-dd05872862f3.png',
-  'assets/4x_use_the_second_image_as_reference__apply_the_art_direction-6d815c8d-2bb4-4c7c-9966-d74b5c1476c9.png',
+// 19 folders under assets/Ticker: name = folder name, firstImage = ball image, images = ticker strip
+const TICKER_FOLDERS = [
+  { name: '0', firstImage: '2x_return the prompt unchanged.jpg', images: ['2x_return the prompt unchanged.jpg', '3A927DB1-F317-47BF-BA00-4A6DF368173B.jpg'] },
+  { name: 'Goldfish Tumbler', firstImage: 'Gemini_Generated_Image_nv1qcinv1qcinv1q.png', images: ['Gemini_Generated_Image_nv1qcinv1qcinv1q.png'] },
+  { name: 'Keep an eye on the clock', firstImage: '2x_replace the product in @1  with @2 (2).png', images: ['2x_replace the product in @1  with @2 (2).png', '2x_replace the product in @1  with @2 (4).png', '2x_replace the product in @1  with @2 (5).png', '2x_replace the product in @1  with @2 (6).png'] },
+  { name: 'Kohler | Instant hot water purifier', firstImage: '2x_use @2 as art direction, adjust the image style of the render, remove the leaves.png', images: ['2x_use @2 as art direction, adjust the image style of the render, remove the leaves.png'] },
+  { name: 'Logitech | Headset design with genetic algorithm', firstImage: 'NSiSQnPolmOJiNeiwU03kSOu84.png', images: ['NSiSQnPolmOJiNeiwU03kSOu84.png'] },
+  { name: 'Logitech | MX MASTER4', firstImage: '02252026_canova_only_for_rendering.79.png', images: ['02252026_canova_only_for_rendering.79.png', '02252026_canova_only_for_rendering.80.png', '02252026_canova_only_for_rendering.81.png', '02252026_canova_only_for_rendering.83.png', '02252026_canova_only_for_rendering.84.png', '02252026_canova_only_for_rendering.85.gif'] },
+  { name: 'Logitech | Signature Solar+', firstImage: '452.png', images: ['452.png', '65_W.png', '65_g.png'] },
+  { name: 'Logitech | Wave keys Sand Colorway', firstImage: 'Wst8ktbXnbLdfPG0u2yYULITNMg.png', images: ['Wst8ktbXnbLdfPG0u2yYULITNMg.png', 'f5CWz1Z0aud8XSLoZsMmbFWAM.png', 'fp4nvBkUdagCsLmJcPo3CLMCbA.jpg.png'] },
+  { name: 'Morph', firstImage: '0wBA3H9BPYhYx2HzNP4h6qFc.png', images: ['0wBA3H9BPYhYx2HzNP4h6qFc.png'] },
+  { name: 'Nodes', firstImage: '4x_make this rendering more realistic, use@2 as reference but remove the metal plate (1).png', images: ['4x_make this rendering more realistic, use@2 as reference but remove the metal plate (1).png', 'BLN5kztPlBeUb3sG0DYqC65Kqs.png', 'Grd0PST2Iuf0CXCpXdWbGmrVVYg.png', 'bookend_0220.48.png', 'nPg6ehlYnHX3J7Gb62RtsXHnJhQ.png'] },
+  { name: 'Octapus', firstImage: '1KK3KonGmBcl1y96J6Uvnf4LU.png', images: ['1KK3KonGmBcl1y96J6Uvnf4LU.png', 'apply the aesthetic of@2  to @1  and make the design more realistic, don_t change the aspect and angle of @1.png'] },
+  { name: 'Onion', firstImage: '0f1b24164697117.63fcd3551e39e.png', images: ['0f1b24164697117.63fcd3551e39e.png', '16e020164697117.63fb9f23ce9a8.jpg', '47b897164697117.64aed32cca6a7.png', '8c3a85164697117.63fd1d19876e5.png', '9ec514164697117.64aed5efe4b5d.png', 'a09fa1164697117.64aed32ccc1ab.png', 'a7fe07164697117.63fba4a7e0e47.gif', 'apBGgK7PNcyyia6g5kk1NLWHo.png', 'bf55e6164697117.64afc6221cd98.png', 'c4013e164697117.63fc477a75df2.png', 'c6021b164697117.63fd1d19865f6.png', 'd89951164697117.63fd1d198304f.jpg'] },
+  { name: 'Post-Purity', firstImage: '4x_apply the details of the red circled part of@2  to the red circled part of @1.png', images: ['4x_apply the details of the red circled part of@2  to the red circled part of @1.png', '4x_change teh pcb color from green to black, 添加顆粒感, change the lens from 50mm to 200mm.png'] },
+  { name: 'Pulse', firstImage: '2x_use@2 as art direction, add motion blur but focus on the Cufflinks.png', images: ['2x_use@2 as art direction, add motion blur but focus on the Cufflinks.png'] },
+  { name: 'Robin', firstImage: 'IMG_2566.JPG', images: ['IMG_2566.JPG'] },
+  { name: 'Sparkle', firstImage: '810ad1123263591.640819e2875ca.png', images: ['810ad1123263591.640819e2875ca.png', 'dfuns 2026-01-18 011459.746.jpg', 'rd6IPEfTi2wToWIW2Ns6x6oVQ.png'] },
+  { name: 'Stool', firstImage: '2x_Front - New view (2).png', images: ['2x_Front - New view (2).png', '2x_Front Left 3_4 View - New view.png', '2x_Left - New view.png', '2x_Top - New view (1).png', '2x_Top - New view (2).png', '4x_use the second image as reference, apply the art direction.png'] },
+  { name: 'T4B', firstImage: '4x_Front - New view.png', images: ['4x_Front - New view.png', '4x_Left - New view.png', '4x_add sticker as decoration to the suitcase (1).png', '4x_make every detail more realistic, make the green sofa in light yellow (1)(1).png', '4x_make every detail more realistic, make the green sofa in light yellow (1).png', '4x_make every detail of the suitcase more realistic, use the detail of@2 as reference.png', '4x_place the red circled design in a empty room, use@2 as reference拷貝(1).png', '4x_place the red circled design in a empty room, use@2 as reference拷貝.png'] },
+  { name: 'YO YO Cable Arranger', firstImage: '2x_merge this @2 with@1 , fully apply the form design of@1 (1).png', images: ['2x_merge this @2 with@1 , fully apply the form design of@1 (1).png', '4x_make the 3d printed material more realistic, it_s printed in Y axis, enhance the contrast (1).png', '4x_merge this @2 with@1 , apply the form design of@2.png', '4x_merge this @2 with@1 , create a portable wire arrange tool with the material and design of @2  , use the background color of @3 , textile wire.png', '4x_merge this @2 with@1 , fully apply the form design of@1.png'] },
 ];
+const TICKER_BASE = 'assets/Ticker/';
+const TICKER_IMAGE_EXT = /\.(png|jpg|jpeg|gif|webp)$/i;
+const TICKER_REF_IMAGES = 5; // Nodes image count; duration scales so all folders scroll at same px/s
+function tickerImageUrl(folderName, filename) {
+  const path = TICKER_BASE + folderName + '/' + filename;
+  const encoded = path.replace(/ /g, '%20').replace(/@/g, '%40').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/,/g, '%2C').replace(/#/g, '%23').replace(/\?/g, '%3F').replace(/&/g, '%26');
+  return ASSET_BASE + encoded;
+}
+function tickerImagesOnly(images) {
+  return images.filter((f) => TICKER_IMAGE_EXT.test(f));
+}
 // Base path for assets so they load on GitHub Pages (e.g. /portfolio/) and locally
 (function () {
   const p = window.location.pathname;
@@ -106,13 +130,101 @@ let pointerY = 0;
 let prevPointerX = 0;
 let prevPointerY = 0;
 let pointerActive = false;
+let arcTickerPanel = null;
+let arcTickerTrack = null;
+let lastTickerFolderIndex = -1;
+let arcTickerSettledSince = 0;  // ms when 90% of balls became settled; 0 = not yet
+const ARC_TICKER_SETTLE_MS = 120;  // hold 90% settled this long before showing
+const ARC_TICKER_PCT_SETTLED = 0.5;
+const ARC_TICKER_SETTLE_SPEED = 0.4;
+const ARC_TICKER_SETTLE_DIST = 10;
+
+const TICKER_FADE_MS = 280;
+
+function setTickerContent(folderIndex) {
+  if (!arcTickerTrack || folderIndex < 0 || folderIndex >= TICKER_FOLDERS.length) return;
+  const folder = TICKER_FOLDERS[folderIndex];
+  if (!folder || !folder.images.length) return;
+  const images = tickerImagesOnly(folder.images);
+  if (!images.length) return;
+  const n = images.length;
+  const gap = 8;
+  const hasExisting = arcTickerTrack.children.length > 0;
+
+  function buildContent() {
+    arcTickerTrack.innerHTML = '';
+    arcTickerTrack.style.animation = 'none';
+    arcTickerTrack.style.opacity = '0';
+    const repeat = 3;
+    let loaded = 0;
+    const items = [];
+
+    function measureAndStart() {
+      loaded++;
+      if (loaded < n) return;
+      const firstSetWidth = items.slice(0, n).reduce((sum, el) => sum + (el.offsetWidth || 0), 0) + gap * Math.max(0, n - 1);
+      arcTickerTrack.style.setProperty('--ticker-offset', `-${firstSetWidth}px`);
+      const durationSec = (10 / TICKER_REF_IMAGES) * n;
+      arcTickerTrack.style.animation = `arc-ticker-scroll ${durationSec}s linear infinite`;
+      requestAnimationFrame(() => {
+        arcTickerTrack.style.opacity = '1';
+      });
+    }
+
+    for (let r = 0; r < repeat; r++) {
+      images.forEach((filename, i) => {
+        const item = document.createElement('div');
+        item.className = 'arc-ticker-item';
+        const img = document.createElement('img');
+        const url = tickerImageUrl(folder.name, filename);
+        img.src = url;
+        img.alt = '';
+        img.loading = 'eager';
+        if (r === 0 && i < n) items.push(item);
+        img.onload = measureAndStart;
+        img.onerror = measureAndStart;
+        item.appendChild(img);
+        arcTickerTrack.appendChild(item);
+      });
+    }
+    if (items.length < n) {
+      requestAnimationFrame(() => {
+        const firstSetWidth = items.reduce((sum, el) => sum + (el.offsetWidth || 0), 0) + gap * Math.max(0, n - 1);
+        arcTickerTrack.style.setProperty('--ticker-offset', `-${firstSetWidth}px`);
+        arcTickerTrack.style.animation = `arc-ticker-scroll ${(10 / TICKER_REF_IMAGES) * n}s linear infinite`;
+        arcTickerTrack.style.opacity = '1';
+      });
+    }
+  }
+
+  if (hasExisting) {
+    arcTickerTrack.style.opacity = '0';
+    arcTickerTrack.style.transition = `opacity ${TICKER_FADE_MS}ms ease`;
+    setTimeout(() => {
+      buildContent();
+    }, TICKER_FADE_MS);
+  } else {
+    buildContent();
+  }
+}
 
 function init() {
+  if (typeof history !== 'undefined' && history.scrollRestoration) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
   bubbleAreaEl = document.getElementById('bubbleArea');
 
   buildHexBubbles();
   requestAnimationFrame(buildHexBubbles);
   window.addEventListener('resize', onResize);
+
+  // Right-half ticker panel: content set by highlighted bubble's folder in arc mode
+  arcTickerPanel = document.createElement('div');
+  arcTickerPanel.className = 'arc-ticker-panel';
+  arcTickerPanel.setAttribute('aria-hidden', 'true');
+  arcTickerTrack = document.createElement('div');
+  arcTickerTrack.className = 'arc-ticker-track';
+  arcTickerPanel.appendChild(arcTickerTrack);
+  document.body.appendChild(arcTickerPanel);
 
   bubbleAreaEl.addEventListener('pointermove', (e) => {
     pointerActive = true;
@@ -130,10 +242,11 @@ function init() {
 
   window.addEventListener('scroll', () => {
     if (window.scrollY <= SCROLL_THRESHOLD) {
+      const fromArc = scrollMode === 2;
       scrollMode = 0;
       bubbleAreaEl.style.minHeight = '';  // reset so grid uses CSS 120vh
       const rect = bubbleAreaEl.getBoundingClientRect();
-      updateRestPositions(rect.width || window.innerWidth, getLayoutHeight());
+      updateRestPositions(rect.width || window.innerWidth, getLayoutHeight(), fromArc);
     } else {
       if (scrollMode !== 2) {
         scrollMode = 2;
@@ -261,18 +374,32 @@ function buildHexBubbles() {
   }
 }
 
-function updateRestPositions(areaWidth, areaHeight) {
+function updateRestPositions(areaWidth, areaHeight, fromArc) {
   const layout = getCircleLayout(areaWidth, areaHeight);
   currentRadius = layout.currentRadius * tuning.ballSize;
   const { step, viewCenterX, viewCenterY } = layout;
   layoutPoints = computePolarGridPoints(step, viewCenterX, viewCenterY, areaWidth, areaHeight).slice(0, NUM_CIRCLES);
   const totalBubbles = getTotalBubbles();
-  bubbles.forEach((b, i) => {
-    if (i >= totalBubbles) return;
-    const { x, y } = layoutPoints[i];
-    b.restX = x;
-    b.restY = y;
-  });
+  if (fromArc && bubbles.length > 0) {
+    const sortedByArcY = bubbles.map((_, i) => i).sort((a, b) => bubbles[a].restY - bubbles[b].restY);
+    const gridPointsByY = layoutPoints.map((p, i) => ({ ...p, i })).sort((a, b) => a.y - b.y);
+    bubbles.forEach((b, i) => {
+      if (i >= totalBubbles) return;
+      const arcRank = sortedByArcY.indexOf(i);
+      const pt = gridPointsByY[arcRank];
+      if (pt) {
+        b.restX = pt.x;
+        b.restY = pt.y;
+      }
+    });
+  } else {
+    bubbles.forEach((b, i) => {
+      if (i >= totalBubbles) return;
+      const { x, y } = layoutPoints[i];
+      b.restX = x;
+      b.restY = y;
+    });
+  }
   const size = currentRadius * 2;
   bubbles.forEach((b) => {
     b.el.style.width = `${size}px`;
@@ -287,28 +414,53 @@ function updateRestPositions(areaWidth, areaHeight) {
 
 // Offset so the top circle is fully visible below the header/name
 const VERTICAL_LINE_TOP_OFFSET = 320;
+// Horizontal offset for vertical line: negative = left
+const VERTICAL_LINE_X_OFFSET = -450;
 
-// Align all circles to a vertical line; first at viewport vertical center, last at vertical center when scrolled to end
-const VERTICAL_LINE_BOTTOM_PADDING = 0;  // 0 = last circle exactly at vertical center at max scroll
+// Align all circles along an R2000 arc; assign arc slots by grid Y-order so transition settles faster
+const VERTICAL_LINE_ARC_RADIUS = 15000;
+const VERTICAL_LINE_SPACING = 1.35;
+const VERTICAL_LINE_BOTTOM_PADDING = 0;
 function updateRestToVerticalLine() {
   const n = bubbles.length;
   if (n === 0) return;
-  const refX = bubbles[0].restX;
-  const spacing = 2 * currentRadius * 1.02;
+  const refX = bubbles[0].restX + VERTICAL_LINE_X_OFFSET;
+  const spacing = 2 * currentRadius * VERTICAL_LINE_SPACING;
   const innerH = window.innerHeight;
   const firstBallY = window.scrollY + innerH / 2;
-  // lineHeightPx so that at max scroll (lineHeightPx - innerH) the last circle is at viewport vertical center
   const lineHeightPx = firstBallY + (n - 1) * spacing + innerH / 2 + VERTICAL_LINE_BOTTOM_PADDING;
   bubbleAreaEl.style.minHeight = `${lineHeightPx}px`;
+
+  const R = VERTICAL_LINE_ARC_RADIUS;
+  const arcSpanY = (n - 1) * spacing;
+  const angleSpan = n > 1 ? arcSpanY / R : 0;
+  const cy = firstBallY + arcSpanY / 2;
+  const cx = refX - R;
+
+  // Shortest-path arrangement: assign arc slots by current (grid) Y order so top ball → top of arc
+  const sortedByY = bubbles.map((_, i) => i).sort((a, b) => bubbles[a].restY - bubbles[b].restY);
+  const arcSlot = new Int32Array(n);
+  sortedByY.forEach((bubbleIndex, slot) => { arcSlot[bubbleIndex] = slot; });
+
+  const arcX = [];
+  const arcY = [];
+  for (let j = 0; j < n; j++) {
+    const theta = n > 1 ? -angleSpan / 2 + (angleSpan * j / (n - 1)) : 0;
+    arcX[j] = cx + R * Math.cos(theta);
+    arcY[j] = cy + R * Math.sin(theta);
+  }
+
   bubbles.forEach((b, i) => {
-    b.restX = refX;
-    b.restY = firstBallY + i * spacing;
+    const j = arcSlot[i];
+    b.restX = arcX[j];
+    b.restY = arcY[j];
     b.vx = 0;
     b.vy = 0;
   });
 }
 
 function createBubbleEl(project, data, bubbleIndex) {
+  const folder = TICKER_FOLDERS[bubbleIndex];
   const wrap = document.createElement('div');
   wrap.className = 'vita-bubble-wrap';
   wrap.style.width = `${currentRadius * 2}px`;
@@ -317,13 +469,14 @@ function createBubbleEl(project, data, bubbleIndex) {
   const el = document.createElement('button');
   el.type = 'button';
   el.className = 'vita-bubble';
-  el.setAttribute('aria-label', project.title);
+  el.setAttribute('aria-label', folder ? folder.name : project.title);
   el.style.width = `${currentRadius * 2}px`;
   el.style.height = `${currentRadius * 2}px`;
 
   const img = document.createElement('span');
   img.className = 'vita-bubble-img';
-  img.style.backgroundImage = `url(${ASSET_BASE}${BUBBLE_IMAGES[bubbleIndex % BUBBLE_IMAGES.length]})`;
+  const ballSrc = folder ? tickerImageUrl(folder.name, folder.firstImage) : (ASSET_BASE + 'assets/nodes/BLN5kztPlBeUb3sG0DYqC65Kqs.png');
+  img.style.backgroundImage = `url("${String(ballSrc).replace(/"/g, '%22')}")`;
   el.appendChild(img);
 
   const hitArea = document.createElement('span');
@@ -333,7 +486,7 @@ function createBubbleEl(project, data, bubbleIndex) {
 
   const label = document.createElement('span');
   label.className = 'vita-bubble-label';
-  label.textContent = project.titleEn || project.title;
+  label.textContent = folder ? folder.name : (project.titleEn || project.title);
 
   wrap.appendChild(el);
   wrap.appendChild(label);
@@ -406,7 +559,7 @@ function physicsLoop() {
   // Forces: spring to rest + repulsion
   const fx = new Float64Array(n);
   const fy = new Float64Array(n);
-  const kRest = (scrollMode === 2 ? tuning.spring * 0.42 : tuning.spring) * tuning.snapback;
+  const kRest = (scrollMode === 2 ? tuning.spring * 0.58 : tuning.spring) * tuning.snapback;
 
   for (let i = 0; i < n; i++) {
     const a = bubbles[i];
@@ -451,7 +604,7 @@ function physicsLoop() {
   // Pull: hovered ball toward cursor, others toward rest
   const SNAP_RADIUS = 2;
   const SNAP_SPEED = 0.8;
-  const basePullLerp = scrollMode === 2 ? 0.05 : tuning.pullLerp;
+  const basePullLerp = scrollMode === 2 ? 0.078 : tuning.pullLerp;
   const pullLerp = basePullLerp * tuning.snapback;
   bubbles.forEach((b) => {
     const targetX = b === hoveredBubble ? pointerX : b.restX;
@@ -481,22 +634,38 @@ function physicsLoop() {
       const screenY = r.top + b.y;
       const centerY = window.innerHeight / 2;
       const distFromCenter = Math.abs(screenY - centerY);
-      const falloff = 320;
-      const centerScale = 1.45;
+      const falloff = 520;
+      const centerScale = 0.88;  // arc balls smaller than grid
       const t = Math.max(0, 1 - distFromCenter / falloff);
-      b.scale = 1 + (centerScale - 1) * t;
-      // Blur label gradually by distance from center; 90%+ clear → show 100% clear
+      const targetScale = 1 + (centerScale - 1) * t;
+      const scaleLerp = 0.1;
+      b.scale += (targetScale - b.scale) * scaleLerp;
+      b.scale = Math.max(0.4, Math.min(1.2, b.scale));
+      // Blur label: smooth lerp toward target so text transition is smooth
       const label = b.el.querySelector('.vita-bubble-label');
       if (label) {
         const isHovered = hoveredBubble === b;
-        const blurFalloff = 280;
+        const blurFalloff = 480;
         const maxBlur = 6;
         const blurT = Math.min(1, distFromCenter / blurFalloff);
-        const blurPx = isHovered ? 0 : blurT * maxBlur;
-        const opacity = isHovered ? 1 : 1 - 0.35 * blurT;
-        const nearlyClear = blurT <= 0.1 || opacity >= 0.9;
-        label.style.filter = nearlyClear || isHovered ? 'none' : (blurPx > 0.1 ? `blur(${blurPx}px)` : 'none');
-        label.style.opacity = nearlyClear || isHovered ? '1' : String(opacity);
+        let targetBlurPx = isHovered ? 0 : blurT * maxBlur;
+        let targetOpacity = isHovered ? 1 : 1 - 0.35 * blurT;
+        let targetFontRem = (blurT <= 0.1 || targetOpacity >= 0.9 || isHovered) ? 1.05 : 0.72;
+        if (targetOpacity >= 0.9 && !isHovered) {
+          targetOpacity = 1;
+          targetBlurPx = 0;
+          targetFontRem = 1.05;
+        }
+        const labelLerp = 0.09;  // smooth follow per frame
+        if (b.labelOpacity == null) b.labelOpacity = targetOpacity;
+        if (b.labelBlurPx == null) b.labelBlurPx = targetBlurPx;
+        if (b.labelFontRem == null) b.labelFontRem = targetFontRem;
+        b.labelOpacity += (targetOpacity - b.labelOpacity) * labelLerp;
+        b.labelBlurPx += (targetBlurPx - b.labelBlurPx) * labelLerp;
+        b.labelFontRem += (targetFontRem - b.labelFontRem) * labelLerp;
+        label.style.filter = b.labelBlurPx < 0.1 ? 'none' : `blur(${b.labelBlurPx.toFixed(2)}px)`;
+        label.style.opacity = String(Math.max(0, Math.min(1, b.labelOpacity)));
+        label.style.fontSize = `${b.labelFontRem.toFixed(2)}rem`;
       }
     } else {
       // Same lerp for all (center, rings, grid shrink) so they scale in sync
@@ -509,6 +678,56 @@ function physicsLoop() {
       b.scale = Math.max(-5, Math.min(5, b.scale));
     }
   });
+
+  // Show ticker only after 90% of balls on the arc are settled
+  if (arcTickerPanel && arcTickerTrack) {
+    if (scrollMode === 2 && bubbles.length > 0) {
+      let settledCount = 0;
+      bubbles.forEach((b) => {
+        const speed = Math.hypot(b.vx, b.vy);
+        const distToRest = Math.hypot(b.x - b.restX, b.y - b.restY);
+        if (speed < ARC_TICKER_SETTLE_SPEED && distToRest < ARC_TICKER_SETTLE_DIST) settledCount++;
+      });
+      const threshold = Math.ceil(bubbles.length * ARC_TICKER_PCT_SETTLED);
+      const ninetyPctSettled = settledCount >= threshold;
+
+      const r = bubbleAreaEl.getBoundingClientRect();
+      const centerY = window.innerHeight / 2;
+      let minD = Infinity;
+      let highlightedBubble = null;
+      bubbles.forEach((b) => {
+        const screenY = r.top + b.y;
+        const d = Math.abs(screenY - centerY);
+        if (d < minD) {
+          minD = d;
+          highlightedBubble = b;
+        }
+      });
+
+      const now = performance.now();
+      if (ninetyPctSettled && highlightedBubble) {
+        if (arcTickerSettledSince === 0) arcTickerSettledSince = now;
+        const elapsed = now - arcTickerSettledSince;
+        if (elapsed >= ARC_TICKER_SETTLE_MS) {
+          const folderIndex = bubbles.indexOf(highlightedBubble);
+          if (folderIndex !== lastTickerFolderIndex) {
+            setTickerContent(folderIndex);
+            lastTickerFolderIndex = folderIndex;
+          }
+          arcTickerPanel.classList.add('is-visible');
+        } else {
+          arcTickerPanel.classList.remove('is-visible');
+        }
+      } else {
+        arcTickerSettledSince = 0;
+        arcTickerPanel.classList.remove('is-visible');
+      }
+    } else {
+      arcTickerSettledSince = 0;
+      arcTickerPanel.classList.remove('is-visible');
+      lastTickerFolderIndex = -1;
+    }
+  }
 
   // Position correction: resolve overlaps; hovered ball stays fixed at center, others get pushed
   function resolveOverlaps() {
@@ -554,7 +773,7 @@ function physicsLoop() {
   const edgeR = areaW - PADDING - EDGE_BUFFER;
   const edgeT = PADDING + EDGE_BUFFER;
   const lineBottom = scrollMode === 2
-    ? (bubbles[0]?.restY ?? 0) + (n - 1) * 2 * currentRadius * 1.02 + currentRadius + 50
+    ? (bubbles[0]?.restY ?? 0) + (n - 1) * 2 * currentRadius * VERTICAL_LINE_SPACING + currentRadius + 50
     : areaH - PADDING - EDGE_BUFFER;
   const edgeB = scrollMode === 2 ? lineBottom : areaH - PADDING - EDGE_BUFFER;
   bubbles.forEach((b) => {

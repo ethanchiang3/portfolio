@@ -249,6 +249,57 @@ body {
   color: #cfd8dc;
 }
 
+/* ----- Arc ticker: band between red lines (top/bottom ~33%), same height, variable width, scale to fit ----- */
+.arc-ticker-panel {
+  position: fixed;
+  right: 0;
+  top: 10vh;
+  bottom: 10vh;
+  width: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.arc-ticker-panel.is-visible {
+  opacity: 1;
+}
+.arc-ticker-track {
+  --ticker-offset: -888px; /* set by JS after images load */
+  background: #fff;
+  transition: opacity 0.28s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  gap: 8px;
+  padding: 0 24px;
+  animation: arc-ticker-scroll 10s linear infinite;
+  width: max-content;
+}
+.arc-ticker-item {
+  flex-shrink: 0;
+  height: 100%;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.arc-ticker-item img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  vertical-align: middle;
+}
+@keyframes arc-ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(var(--ticker-offset)); }
+}
+
 @media (max-width: 600px) {
   .vita-bubble {
     --bubble-size: 72px;
